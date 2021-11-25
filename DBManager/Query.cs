@@ -17,9 +17,6 @@ namespace DBManager
 
 		public Query(DBHelper helper, string sql, params MySqlParameter[] options)
 		{
-			var s = typeof(T).GetFields().SelectMany(x => x.GetCustomAttributesData());
-			var s2 = typeof(T).GetFields().SelectMany(x => x.GetCustomAttributes());
-			var s3 = typeof(T).GetFields().SelectMany(x => x.GetCustomAttributes<SqlColumnNameAttribute>());
 			var others = typeof(T);
 			_dbHelper = helper;
 			_sql = sql;
@@ -36,7 +33,7 @@ namespace DBManager
 			.GetProperties()
 			.Where(x => x.CanWrite)
 			.Where(x => x.GetCustomAttribute<SqlColumnNameAttribute>() != null)
-			.ToDictionary(x => x.GetCustomAttribute<SqlColumnNameAttribute>().Name, x => x);
+			.ToDictionary(x => x.GetCustomAttribute<SqlColumnNameAttribute>().Name.ToLower(),x => x);
 
 		/// <summary>
 		///		Clear the map cache on <see cref="T"/>
@@ -54,7 +51,7 @@ namespace DBManager
 		/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
 		public List<T> Run(T tBase)
 		{
-			_map ??= _readMap();
+			_map = _map.Count >= 1 ? _map : _readMap();
 
 			MySqlDataReader reader = _dbHelper.RunQueryAsync(_sql, _parameters).Result;
 			List<T> result = new();
@@ -64,7 +61,7 @@ namespace DBManager
 				result.Add(tBase);
 				for (int j = 0; j < reader.FieldCount; j++)
 				{
-					if (_map.GetValueOrDefault(reader.GetName(j), null) is PropertyInfo info)
+					if (_map.GetValueOrDefault(reader.GetName(j).ToLower(), null) is PropertyInfo info)
 					{
 						info.SetValue(result[i], reader[j]);
 					}

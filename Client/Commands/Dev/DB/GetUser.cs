@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
@@ -17,7 +17,7 @@ namespace Client.Commands
 			public async Task GetUser(IUser discordUser)
 			{
 				Query<User> user = new(DBHelper, $"select * from users where (discordId={discordUser.Id})");
-				await Context.Interaction.RespondAsync(user.Run(new()).First().IsDev.ToString());
+				await Context.Interaction.RespondAsync(JsonSerializer.Serialize(user.Run(new())));
 			}
 		}
 	}

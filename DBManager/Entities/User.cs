@@ -12,5 +12,7 @@ namespace DBManager
 		public bool IsDev { get; set; }
 		[SqlColumnName("discordId")]
 		public ulong Id { get; set; }
+		[SqlColumnName("id")]
+		public ulong InternalId { get; set; }
 	}
 }
