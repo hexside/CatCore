@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
+using DBManager;
 
 namespace Client.Commands
 {
@@ -13,10 +14,13 @@ namespace Client.Commands
 	{
 		[Group("commands", "devtools related to managing commands.")]
 		public partial class Commands : InteractionModuleBase<SocketInteractionContext> { }
+
+		[Group("db", "commands related to testing the db")]
+		public partial class DB : InteractionModuleBase<SocketInteractionContext> 
+		{
+			public DBHelper DBHelper { get; set; }
+		}
 	}
 
-	public partial class UnGrouped 
-	{
-
-	}
+	public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext> { }
 }

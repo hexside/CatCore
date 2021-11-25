@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CottageDwellingAdditions;
+using DBManager;
 
 namespace Client;
 
@@ -15,14 +16,23 @@ internal class Program
 {
 	private static bool _firstReady = true;
 	private static Logger _logger;
-	private static ClientSettings _settings = new("clientSettings.json");
+	private static readonly ClientSettings _settings = new("clientSettings.json");
 
-	static ServiceProvider _configureServices() => new ServiceCollection()
-		.AddSingleton(new DiscordSocketClient(new() { LogLevel = LogSeverity.Debug }))
+	private static ServiceProvider _configureServices() => new ServiceCollection()
+		.AddSingleton(new DiscordSocketClient(new() 
+		{ 
+			LogLevel = LogSeverity.Debug, 
+			GatewayIntents = GatewayIntents.Guilds 
+		}))
 		.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), 
-			new() { LogLevel=LogSeverity.Debug}))
+			new() 
+			{ 
+				LogLevel=LogSeverity.Debug, 
+				DefaultRunMode = RunMode.Async
+		}))
 		.AddSingleton<CommandHandler>(x => new(x.GetRequiredService<DiscordSocketClient>(),
 			x.GetRequiredService<InteractionService>(), x))
+		.AddSingleton(new DBHelper(_settings.DBConnectionString))
 		.BuildServiceProvider();
 
 	private static async Task Main(string[] _)

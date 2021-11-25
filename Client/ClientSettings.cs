@@ -23,6 +23,7 @@ namespace Client
 		public string WebhookUrl;
 		public ulong DebugGuildId;
 		public bool DebugMode;
+		public string DBConnectionString;
 		public ClientSettings(string fileLocation = "clientSettings.jsonc")
 		{
 			var _this = JsonSerializer.Deserialize<ClientSettings>(File.ReadAllText(fileLocation), _options);
@@ -31,6 +32,7 @@ namespace Client
 			this.WebhookUrl = _this.WebhookUrl.Trim();
 			this.DebugGuildId = _this.DebugGuildId;
 			this.DebugMode = _this.DebugMode;
+			this.DBConnectionString = _this.DBConnectionString;
 		}
 		public ClientSettings() { }
 	}

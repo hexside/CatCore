@@ -14,11 +14,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.Labs" Version="3.3.2" />
-    <PackageReference Include="Discord.Net.Labs.Interactions" Version="3.3.2-2021.11.21" />
+    <PackageReference Include="Discord.Net.Labs" Version="3.3.3" />
+    <PackageReference Include="Discord.Net.Labs.Interactions" Version="3.3.3-2021.11.24" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DBManager\DBManager.csproj" />
+    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
