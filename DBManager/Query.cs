@@ -10,7 +10,7 @@ namespace DBManager
 {
 	public class Query<T>
 	{
-		private static Dictionary<Type, Dictionary<string, PropertyInfo>> _map = new();
+		private static Dictionary<string, PropertyInfo> _map = new();
 		private readonly string _sql;
 		private readonly MySqlParameter[] _parameters;
 		private readonly DBHelper _dbHelper;
@@ -25,11 +25,12 @@ namespace DBManager
 			_sql = sql;
 			_parameters = options;
 
-			if (!_map.ContainsKey(typeof(T)))
+			if (_map.Count >= 1)
 			{
-				_map.Add(typeof(T), _readMap());
+				_map = _readMap();
 			}
 		}
+
 
 		private static Dictionary<string, PropertyInfo> _readMap() => typeof(T)
 			.GetProperties()
@@ -37,30 +38,41 @@ namespace DBManager
 			.Where(x => x.GetCustomAttribute<SqlColumnNameAttribute>() != null)
 			.ToDictionary(x => x.GetCustomAttribute<SqlColumnNameAttribute>().Name, x => x);
 
+		/// <summary>
+		///		Clear the map cache on <see cref="T"/>
+		/// </summary>
 		public static void DumbMappings()
 			=> _map = new();
 
-		public T Run(T value)
+		/// <summary>
+		///		Run the query.
+		/// </summary>
+		/// <param name="tBase">
+		/// The default object to use; set to <see langword="new"/>(<see cref="T"/>)
+		/// for a blank implemetation
+		/// </param>
+		/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
+		public List<T> Run(T tBase)
 		{
-			Dictionary<string, PropertyInfo> map = _map.GetValueOrDefault(typeof(T), null)
-				?? _readMap();
+			_map ??= _readMap();
 
 			MySqlDataReader reader = _dbHelper.RunQueryAsync(_sql, _parameters).Result;
+			List<T> result = new();
 
-			while (reader.Read())
+			for (int i = 0; reader.Read(); i++)
 			{
-				for (int i = 0; i < reader.FieldCount; i++)
+				result.Add(tBase);
+				for (int j = 0; j < reader.FieldCount; j++)
 				{
-					// if a setter for the specified row exists use it
-					if (map.GetValueOrDefault(reader.GetName(i), null) is PropertyInfo info)
+					if (_map.GetValueOrDefault(reader.GetName(j), null) is PropertyInfo info)
 					{
-						info.SetValue(value, reader[i]);
+						info.SetValue(result[i], reader[j]);
 					}
 				}
 			}
 
 			reader.Dispose();
-			return value;
+			return result;
 		}
 	}
 }

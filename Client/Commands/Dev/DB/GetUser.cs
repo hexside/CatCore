@@ -17,7 +17,7 @@ namespace Client.Commands
 			public async Task GetUser(IUser discordUser)
 			{
 				Query<User> user = new(DBHelper, $"select * from users where (discordId={discordUser.Id})");
-				await Context.Interaction.RespondAsync(user.Run(new()).IsDev.ToString());
+				await Context.Interaction.RespondAsync(user.Run(new()).First().IsDev.ToString());
 			}
 		}
 	}

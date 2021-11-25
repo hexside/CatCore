@@ -36,6 +36,12 @@ namespace DBManager
 		public async Task<MySqlDataReader> RunQueryAsync(string sql, params MySqlParameter[] options)
 			=> await MySqlHelper.ExecuteReaderAsync(_connectionString, sql, options);
 
+		/// <summary>
+		///		Runs a myswl Query and returns the rows effected.
+		/// </summary>
+		/// <param name="sql">the query to run</param>
+		/// <param name="options">the options for the query</param>
+		/// <returns>the number of rows effected</returns>
 		public async Task<int> RunNonQueryAsync(string sql, params MySqlParameter[] options)
 			=> await MySqlHelper.ExecuteNonQueryAsync(_connectionString, sql, options);
 
