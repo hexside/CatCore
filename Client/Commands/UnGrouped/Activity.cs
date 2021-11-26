@@ -54,7 +54,7 @@ public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext>
 		await Context.Interaction.RespondAsync("click the button below to launch the activity", component: cb.Build());
 	}
 
-	public class ActivityAutocompleteProvider : Autocompleter
+	public class ActivityAutocompleteProvider : AutocompleteHandler
 	{
 		public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, 
 			IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)

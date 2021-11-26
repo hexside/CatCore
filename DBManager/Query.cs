@@ -8,6 +8,10 @@ using MySql.Data.MySqlClient;
 
 namespace DBManager
 {
+	/// <summary>
+	/// A helper class used to convert sql statments to managed objects
+	/// </summary>
+	/// <typeparam name="T">The type of object this class will convert</typeparam>
 	public class Query<T>
 	{
 		private static Dictionary<string, PropertyInfo> _map = new();
@@ -15,9 +19,14 @@ namespace DBManager
 		private readonly MySqlParameter[] _parameters;
 		private readonly DBHelper _dbHelper;
 
+		/// <summary>
+		/// Initilises the Query
+		/// </summary>
+		/// <param name="helper">the DBHelper to interact with the databse with</param>
+		/// <param name="sql">the sql query to run</param>
+		/// <param name="options">the parameters to apply to the query</param>
 		public Query(DBHelper helper, string sql, params MySqlParameter[] options)
 		{
-			var others = typeof(T);
 			_dbHelper = helper;
 			_sql = sql;
 			_parameters = options;
@@ -27,7 +36,6 @@ namespace DBManager
 				_map = _readMap();
 			}
 		}
-
 
 		private static Dictionary<string, PropertyInfo> _readMap() => typeof(T)
 			.GetProperties()
@@ -49,11 +57,13 @@ namespace DBManager
 		/// for a blank implemetation
 		/// </param>
 		/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
-		public List<T> Run(T tBase)
+		public async Task<List<T>> RunAsync(T tBase)
 		{
-			_map = _map.Count >= 1 ? _map : _readMap();
+			_map = _map.Count >= 1 
+				? _map 
+				: _readMap();
 
-			MySqlDataReader reader = _dbHelper.RunQueryAsync(_sql, _parameters).Result;
+			MySqlDataReader reader =  await _dbHelper.RunQueryAsync(_sql, _parameters);
 			List<T> result = new();
 
 			for (int i = 0; reader.Read(); i++)

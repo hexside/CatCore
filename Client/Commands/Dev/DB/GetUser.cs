@@ -15,10 +15,7 @@ namespace Client.Commands
 		{
 			[SlashCommand("get-user", "gets the `IsDev` value from a specific user")]
 			public async Task GetUser(IUser discordUser)
-			{
-				Query<User> user = new(DBHelper, $"select * from users where (discordId={discordUser.Id})");
-				await Context.Interaction.RespondAsync(JsonSerializer.Serialize(user.Run(new())));
-			}
+				=> await Context.Interaction.RespondAsync(JsonSerializer.Serialize(await DBHelper.GetUserAsync(discordUser.Id)));
 		}
 	}
 }
