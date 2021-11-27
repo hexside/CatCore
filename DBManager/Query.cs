@@ -81,24 +81,8 @@ namespace DBManager
 		/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
 		public async Task<List<T>> RunAsync(T tBase)
 		{
-			_map = _map.Count >= 1 
-				? _map 
-				: _readMap();
-
 			MySqlDataReader reader =  await _dbHelper.RunQueryAsync(_sql, _parameters);
-			List<T> result = new();
-
-			for (int i = 0; reader.Read(); i++)
-			{
-				result.Add(tBase);
-				for (int j = 0; j < reader.FieldCount; j++)
-				{
-					if (_map.GetValueOrDefault(reader.GetName(j).ToLower(), null) is PropertyInfo info)
-					{
-						info.SetValue(result[i], reader[j]);
-					}
-				}
-			}
+			List<T> result = ParseReader(reader, tBase);
 			reader.Dispose();
 			return result;
 		}
@@ -112,12 +96,26 @@ namespace DBManager
 		/// </param>
 		/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
 		public List<T> Run(T tBase)
+			=> RunAsync(tBase).Result;
+
+		/// <summary>
+		///		This method parses a <see cref="MySqlDataReader"/> and produces a 
+		///		<see cref="List{T}"/> of staticly typed objects as provided by the
+		///		reader.
+		/// </summary>
+		/// <param name="reader">the reader to parse</param>
+
+		/// <param name="tBase">
+		///		The default object to use; set to <see langword="new"/>(<see cref="T"/>)
+		///		for a blank implemetation
+		/// </param>
+		/// <returns></returns>
+		public static List<T> ParseReader(MySqlDataReader reader, T tBase)
 		{
-			_map = _map.Count >= 1 
-				? _map 
+			_map = _map.Count >= 1
+				? _map
 				: _readMap();
 
-			MySqlDataReader reader = _dbHelper.RunQuery(_sql, _parameters);
 			List<T> result = new();
 
 			for (int i = 0; reader.Read(); i++)
@@ -131,7 +129,6 @@ namespace DBManager
 					}
 				}
 			}
-			reader.Dispose();
 			return result;
 		}
 	}

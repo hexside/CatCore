@@ -4,7 +4,7 @@
 	{
 		public partial class DB
 		{
-			public enum SqlCommandResponceType
+			public enum ResponceForm
 			{
 				RowsEffected,
 				ConvertedReader
