@@ -21,6 +21,9 @@ namespace Client.Commands
 			public DBHelper DBHelper { get; set; }
 		}
 	}
-
+	public partial class Pronouns : InteractionModuleBase<SocketInteractionContext>
+	{
+		public DBHelper DBHelper { get; set; }
+	}
 	public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext> { }
 }

@@ -77,7 +77,38 @@ namespace DBManager
 					}
 				}
 			}
+			reader.Dispose();
+			return result;
+		}
 
+		/// <summary>
+		///		Run the query.
+		/// </summary>
+		/// <param name="tBase">
+		/// The default object to use; set to <see langword="new"/>(<see cref="T"/>)
+		/// for a blank implemetation
+		/// </param>
+		/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
+		public List<T> Run(T tBase)
+		{
+			_map = _map.Count >= 1 
+				? _map 
+				: _readMap();
+
+			MySqlDataReader reader = _dbHelper.RunQuery(_sql, _parameters);
+			List<T> result = new();
+
+			for (int i = 0; reader.Read(); i++)
+			{
+				result.Add(tBase);
+				for (int j = 0; j < reader.FieldCount; j++)
+				{
+					if (_map.GetValueOrDefault(reader.GetName(j).ToLower(), null) is PropertyInfo info)
+					{
+						info.SetValue(result[i], reader[j]);
+					}
+				}
+			}
 			reader.Dispose();
 			return result;
 		}

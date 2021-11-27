@@ -19,7 +19,10 @@ namespace DBManager
 		// (for example characters-guildId-all and characters-guildId-name)
 		private static Dictionary<string, string> _states => new()
 		{
-			{ "users-discordId", "SELECT * FROM USERS WHERE (discordId=@di);" },
+			{ "users-discordId", "SELECT * FROM users WHERE (discordId=@discordId);" },
+			{ "pronouns-userId", "select id, subject, object, possesive, " +
+				"reflexive from pronouns, userpronouns where userpronouns." +
+				"pronounId=pronouns.id and userpronouns.userId=@userId;" }
 		};
 
 		internal string _connectionString;
@@ -59,6 +62,24 @@ namespace DBManager
 			=> await MySqlHelper.ExecuteNonQueryAsync(_connectionString, sql, options);
 
 		/// <summary>
+		/// Runs a mysql query on the server.
+		/// </summary>
+		/// <param name="sql">the query to run</param>
+		/// <param name="options">the options for the query</param>
+		/// <returns>a <see cref="MySqlDataReader"/> representing the query output</returns>
+		public MySqlDataReader RunQuery(string sql, params MySqlParameter[] options)
+			=> MySqlHelper.ExecuteReader(_connectionString, sql, options);
+
+		/// <summary>
+		///		Runs a myswl Query and returns the rows effected.
+		/// </summary>
+		/// <param name="sql">the query to run</param>
+		/// <param name="options">the options for the query</param>
+		/// <returns>the number of rows effected</returns>
+		public int RunNonQuery(string sql, params MySqlParameter[] options)
+			=> MySqlHelper.ExecuteNonQuery(_connectionString, sql, options);
+
+		/// <summary>
 		/// Pings the server
 		/// </summary>
 		/// <returns>true of the server is avilible, otherwise false</returns>
@@ -71,9 +92,17 @@ namespace DBManager
 		/// <param name="discordId">The users id</param>
 		/// <returns>The user</returns>
 		public async Task<User> GetUserAsync(ulong discordId)
-			=> (await new Query<User>(this, _states["users-discordId"], new MySqlParameter("@di", discordId))
+			=> (await new Query<User>(this, _states["users-discordId"], new MySqlParameter("@discordId", discordId))
 			.RunAsync(new()))
 			.First();
 
+		/// <summary>
+		/// Get a users pronouns
+		/// </summary>
+		/// <param name="userId">the Id of the user to get pronouns from</param>
+		/// <returns>the pronouns the user has specified</returns>
+		public async Task<List<Pronoun>> GetPronounsAsync(ulong userId)
+			=> await new Query<Pronoun>(this, _states["pronouns-userId"], 
+				new MySqlParameter("@userId", userId)).RunAsync(new());
 	}
 }
