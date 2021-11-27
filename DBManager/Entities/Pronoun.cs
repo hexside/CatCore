@@ -9,10 +9,11 @@ namespace DBManager
 {
 	public class Pronoun
 	{
-		[SqlColumnName("id")]
+		[SqlReadonly]
+		[SqlColumn("id")]
 		public ulong Id { get; set; }
 		private string _subject;
-		[SqlColumnName("subject")]
+		[SqlColumn("subject")]
 		public string Subject
 		{
 			get => _subject;
@@ -21,7 +22,7 @@ namespace DBManager
 				: throw new ArgumentException("cannot write to _subject because value is to long");
 		}
 		private string _object;
-		[SqlColumnName("object")]
+		[SqlColumn("object")]
 		public string Object
 		{
 			get => _object;
@@ -30,7 +31,7 @@ namespace DBManager
 				: throw new ArgumentException("cannot write to _object because value is to long");
 		}
 		private string _possesive;
-		[SqlColumnName("possesive")]
+		[SqlColumn("possesive")]
 		public string Possesive
 		{
 			get => _possesive;
@@ -39,7 +40,7 @@ namespace DBManager
 				: throw new ArgumentException("cannot write to _possesive because value is to long");
 		}
 		private string _reflexive;
-		[SqlColumnName("reflexive")]
+		[SqlColumn("reflexive")]
 		public string Reflexive
 		{
 			get => _reflexive;

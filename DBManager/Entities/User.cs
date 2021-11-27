@@ -8,11 +8,20 @@ namespace DBManager
 {
 	public class User
 	{
-		[SqlColumnName("isDev")]
+		[SqlColumn("isDev")]
 		public bool IsDev { get; set; }
-		[SqlColumnName("discordId")]
+		[SqlColumn("discordId")]
 		public ulong Id { get; set; }
-		[SqlColumnName("id")]
+		[SqlColumn("id")]
+		[SqlReadonly]
 		public ulong InternalId { get; set; }
+
+		public User(bool isDev, ulong id)
+		{
+			Id = id;
+			IsDev = isDev;
+		}
+
+		public User() { }
 	}
 }

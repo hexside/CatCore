@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace DBManager
 {
 	[AttributeUsage(AttributeTargets.Property)]
-	internal class SqlColumnNameAttribute : Attribute
+	internal class SqlReadonlyAttribute : Attribute
 	{
-		public string Name;
+		public bool set = false;
 
-		public SqlColumnNameAttribute(string name)
+		public SqlReadonlyAttribute()
 		{
-			Name = name;
+			set = true;
 		}
 	}
 }

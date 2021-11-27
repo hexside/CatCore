@@ -8,9 +8,10 @@ namespace DBManager
 {
 	public class UserPronoun
 	{
-		[SqlColumnName("pronounId")]
+		[SqlReadonly]
+		[SqlColumn("pronounId")]
 		public ulong PronounId { get; set; }
-		[SqlColumnName("userId")]
+		[SqlColumn("userId")]
 		public ulong UserId { get; set; }
 	}
 }

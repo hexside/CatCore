@@ -30,9 +30,9 @@ namespace Client.Commands
 					{
 						// use a fancy json conversion if possible
 						SqlResultType.User => JsonSerializer.Serialize(
-							new Query<User>(DBHelper, command, QueryType.RawSql).Run(new()), _jsonOptions),
+							new DBReader<User>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						SqlResultType.Pronoun => JsonSerializer.Serialize(
-							new Query<Pronoun>(DBHelper, command, QueryType.RawSql).Run(new()), _jsonOptions),
+							new DBReader<Pronoun>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						// when that fails fallback on the legacy behavior
 						_ => (await DBHelper.RunQueryAsync(command)).ReadAsText(2000)
 					};

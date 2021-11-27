@@ -111,8 +111,8 @@ namespace DBManager
 		/// <param name="discordId">The users id</param>
 		/// <returns>The user</returns>
 		public async Task<User> GetUserAsync(ulong discordId)
-			=> (await new Query<User>(this, "users", QueryType.Table,
-				new MySqlParameter("@discordId", discordId))
+			=> (await new DBReader<User>(this, "users", ReadAction.Table,
+				new MySqlParameter("discordId", discordId))
 				.RunAsync(new()))
 				.First();
 
@@ -122,8 +122,11 @@ namespace DBManager
 		/// <param name="userId">the Id of the user to get pronouns from</param>
 		/// <returns>the pronouns the user has specified</returns>
 		public async Task<List<Pronoun>> GetPronounsAsync(ulong userId)
-			=> await new Query<Pronoun>(this, "GetPronounsFromUserId", QueryType.Embedded,
-				new MySqlParameter("@userId", userId))
+			=> await new DBReader<Pronoun>(this, "GetPronounsFromUserId", ReadAction.Embedded,
+				new MySqlParameter("userId", userId))
 				.RunAsync(new());
+
+		public async Task AddUserAsync(ulong userId, bool isDev)
+			=> await new DBWriter<User>(this, "users", new User(isDev, userId), WriteAction.Add).RunAsync();
 	}
 }

@@ -1,6 +1,6 @@
 ﻿namespace DBManager
 {
-	public enum QueryType
+	public enum ReadAction
 	{
 		Table,
 		RawSql,

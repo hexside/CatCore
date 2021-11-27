@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Ubiety.Dns.Core;
+using System.Text.Json;
 
 namespace DBManager
 {
@@ -43,6 +44,23 @@ namespace DBManager
 			// return a value accounting for the added newline
 			reader.Dispose();
 			return responce[..^1];
+		}
+
+		public static string Cp(this string s) => s.StartsWith('@') ? s[1..] : s;
+
+		public static T Copy<T>(this T obj)
+		{
+			JsonSerializerOptions options = new()
+			{
+				AllowTrailingCommas = true,
+				IgnoreReadOnlyFields = false,
+				IgnoreReadOnlyProperties = false,
+				IncludeFields = true,
+				PropertyNameCaseInsensitive = false,
+				WriteIndented = false,
+			};
+			string serialised = JsonSerializer.Serialize(obj, options);
+			return JsonSerializer.Deserialize<T>(serialised);
 		}
 	}
 }
