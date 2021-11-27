@@ -15,16 +15,22 @@ namespace DBManager
 	public class Query<T>
 	{
 		private static Dictionary<string, PropertyInfo> _map = new();
-		private readonly string _sql;
+		private string _sql;
 		private readonly MySqlParameter[] _parameters;
 		private readonly DBHelper _dbHelper;
-		private readonly QueryType _qt;
 
 		/// <summary>
-		/// Initilises the Query
+		///		Initilises the Query
 		/// </summary>
+		/// <remarks>
+		///		When running with the queryType of <see cref="QueryType.Table"/>
+		///		you can specify <see cref="MySqlParameter"/>s via <paramref name="options"/>
+		///		each option should have a <see cref="MySqlParameter.ParameterName"/>
+		///		that matches the column you want to compare against
+		/// </remarks>
 		/// <param name="helper">the DBHelper to interact with the databse with</param>
 		/// <param name="query">the sql query to run</param>
+		/// <param name="queryType">the type of query to run</param>
 		/// <param name="options">the parameters to apply to the query</param>
 		public Query(DBHelper helper, string query, QueryType queryType, params MySqlParameter[] options)
 		{
@@ -33,9 +39,18 @@ namespace DBManager
 			{
 				QueryType.Embedded => helper.Sql[query],
 				QueryType.RawSql => query,
-				QueryType.Table => $"Select * from {query};",
+				QueryType.Table => $"Select * from {query}",
 				_ => throw new ArgumentException("Invalid enum value", nameof(queryType))
 			};
+
+			if (queryType == QueryType.Table && options.Length >= 1)
+			{
+				_sql += " where " + 
+					string.Concat(options.Select(x => $"{x.ParameterName}={x.Value} and "))[..^4] + ";";
+			}
+
+			Console.WriteLine(_sql);
+
 			_parameters = options;
 
 			if (_map.Count >= 1)

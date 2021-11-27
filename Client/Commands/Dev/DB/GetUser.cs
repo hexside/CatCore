@@ -13,7 +13,7 @@ namespace Client.Commands
 	{
 		public partial class DB
 		{
-			private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions()
+			private static readonly JsonSerializerOptions _jsonOptions = new()
 			{
 				WriteIndented = true
 			};
