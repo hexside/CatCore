@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>annotations</Nullable>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.27" />
+	  <PackageReference Include="MySql.Data" Version="8.0.27" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Utils\Utils.csproj" />
+	  <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
+  <Target Name="AddQueries" BeforeTargets="BeforeBuild">
+	  <CreateItem Include="Queries/**/*.sql">
+		  <Output ItemName="EmbeddedResource" TaskParameter="Include" />
+	  </CreateItem>
+  </Target>
 </Project>

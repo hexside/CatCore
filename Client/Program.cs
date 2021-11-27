@@ -41,16 +41,20 @@ internal class Program
 		var client = services.GetRequiredService<DiscordSocketClient>();
 		var commands = services.GetRequiredService<InteractionService>();
 		var handler = services.GetRequiredService<CommandHandler>();
+		var db = services.GetRequiredService<DBHelper>();
 
 		client.Log += async (x) => await _logger.Log(x);
 		commands.Log += async (x) => await _logger.Log(x);
+		db.Log += async (x) => await _logger.Log(x);
+		handler.Log += async x => await _logger.Log(x);
+		
 
 		_logger = new("Client", _settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
 		await _logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
 
-		handler.Log += async x => await _logger.Log(x);
 		await handler.InitializeAsync();
+		db.Init();
 
 		client.Ready += async () =>
 		{

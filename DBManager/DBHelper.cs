@@ -4,6 +4,10 @@ using MySql;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Net;
+using CottageDwellingAdditions;
+using System.Reflection;
+using System.IO;
+using Discord;
 
 namespace DBManager
 {
@@ -19,10 +23,7 @@ namespace DBManager
 		// (for example characters-guildId-all and characters-guildId-name)
 		private static Dictionary<string, string> _states => new()
 		{
-			{ "users-discordId", "SELECT * FROM users WHERE (discordId=@discordId);" },
-			{ "pronouns-userId", "select id, subject, object, possesive, " +
-				"reflexive from pronouns, userpronouns where userpronouns." +
-				"pronounId=pronouns.id and userpronouns.userId=@userId;" }
+			{ "users-discordId", "SELECT * FROM users WHERE (discordId=@discordId);" }
 		};
 
 		internal string _connectionString;
@@ -30,17 +31,48 @@ namespace DBManager
 		/// This does not support load balencing and should only be used for pinging the server.
 		/// </summary>
 		internal MySqlConnection _connection;
+		internal Logger _logger;
+		internal Dictionary<string, string> _sql { get; private protected set; }
+		
+		public event Func<LogMessage, Task> Log;
 
 		public DBHelper(string connectionString)
 		{
+			_logger = new("dbHelper", LogSeverity.Debug);
+			_logger.LogFired += async x => await Log.Invoke(x);
+			_connectionString = connectionString;
+
 			_connection = new MySqlConnection(connectionString);
 			_connection.Open();
 			// validate the string
 			if (!_connection.Ping())
-				throw new ArgumentException("The databse is ofline or the connection string is invalid", 
-					nameof(connectionString));
+			{
+				string error = "The databse is ofline or the connection string is invalid";
+				throw new ArgumentException(error, nameof(connectionString));
+			}
+		}
 
-			_connectionString = connectionString;
+		/// <summary>
+		/// Rebuilds the cache of sql queries stored.
+		/// </summary>
+		public void Init()
+		{
+			_logger.LogVerbose("starting db init process").ConfigureAwait(false);
+			_sql = new();
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			List<string> sqlFiles = assembly.GetManifestResourceNames()
+				.Where(x => x.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase))
+				.ToList();
+			_logger.LogVerbose($"found {sqlFiles.Count} embedded sql files.").ConfigureAwait(false);
+
+			sqlFiles.OnEach(x =>
+			{
+				string cleanName = string.Concat(x.Split('.')[^2..^1]);
+				Stream s = assembly.GetManifestResourceStream(x);
+				using StreamReader reader = new(s);
+				_logger.LogDebug($"adding the sql file {cleanName}").ConfigureAwait(false);
+				_sql.Add(cleanName, reader.ReadToEnd());
+			});
 		}
 
 		/// <summary>
@@ -93,8 +125,8 @@ namespace DBManager
 		/// <returns>The user</returns>
 		public async Task<User> GetUserAsync(ulong discordId)
 			=> (await new Query<User>(this, _states["users-discordId"], new MySqlParameter("@discordId", discordId))
-			.RunAsync(new()))
-			.First();
+				.RunAsync(new()))
+				.First();
 
 		/// <summary>
 		/// Get a users pronouns
@@ -102,7 +134,8 @@ namespace DBManager
 		/// <param name="userId">the Id of the user to get pronouns from</param>
 		/// <returns>the pronouns the user has specified</returns>
 		public async Task<List<Pronoun>> GetPronounsAsync(ulong userId)
-			=> await new Query<Pronoun>(this, _states["pronouns-userId"], 
-				new MySqlParameter("@userId", userId)).RunAsync(new());
+			=> await new Query<Pronoun>(this, _sql["GetPronounsFromUserId"], 
+				new MySqlParameter("@userId", userId))
+				.RunAsync(new());
 	}
 }
