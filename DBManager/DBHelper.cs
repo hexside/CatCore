@@ -13,26 +13,13 @@ namespace DBManager
 {
 	public class DBHelper
 	{
-		// the name format is "table-column,column" in camelCase
-		// param names should be first letter of each word (so columnOne is co)
-		// param names should be indexed by adding -n to the end, with n being the
-		// zero index parameter number
-		//
-		// in the case that a parameter needs to be selerated from another; a second -
-		// and a susinct description of the diference between the two is good
-		// (for example characters-guildId-all and characters-guildId-name)
-		private static Dictionary<string, string> _states => new()
-		{
-			{ "users-discordId", "SELECT * FROM users WHERE (discordId=@discordId);" }
-		};
-
 		internal string _connectionString;
 		/// <summary>
 		/// This does not support load balencing and should only be used for pinging the server.
 		/// </summary>
 		internal MySqlConnection _connection;
 		internal Logger _logger;
-		internal Dictionary<string, string> _sql { get; private protected set; }
+		public Dictionary<string, string> Sql { get; private set; }
 		
 		public event Func<LogMessage, Task> Log;
 
@@ -58,7 +45,7 @@ namespace DBManager
 		public void Init()
 		{
 			_logger.LogVerbose("starting db init process").ConfigureAwait(false);
-			_sql = new();
+			Sql = new();
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			List<string> sqlFiles = assembly.GetManifestResourceNames()
 				.Where(x => x.EndsWith(".sql", StringComparison.InvariantCultureIgnoreCase))
@@ -71,7 +58,7 @@ namespace DBManager
 				Stream s = assembly.GetManifestResourceStream(x);
 				using StreamReader reader = new(s);
 				_logger.LogDebug($"adding the sql file {cleanName}").ConfigureAwait(false);
-				_sql.Add(cleanName, reader.ReadToEnd());
+				Sql.Add(cleanName, reader.ReadToEnd());
 			});
 		}
 
@@ -124,7 +111,8 @@ namespace DBManager
 		/// <param name="discordId">The users id</param>
 		/// <returns>The user</returns>
 		public async Task<User> GetUserAsync(ulong discordId)
-			=> (await new Query<User>(this, _states["users-discordId"], new MySqlParameter("@discordId", discordId))
+			=> (await new Query<User>(this, "GetUserFromDiscordId", QueryType.Embedded,
+				new MySqlParameter("@discordId", discordId))
 				.RunAsync(new()))
 				.First();
 
@@ -134,7 +122,7 @@ namespace DBManager
 		/// <param name="userId">the Id of the user to get pronouns from</param>
 		/// <returns>the pronouns the user has specified</returns>
 		public async Task<List<Pronoun>> GetPronounsAsync(ulong userId)
-			=> await new Query<Pronoun>(this, _sql["GetPronounsFromUserId"], 
+			=> await new Query<Pronoun>(this, "GetPronounsFromUserId", QueryType.Embedded,
 				new MySqlParameter("@userId", userId))
 				.RunAsync(new());
 	}

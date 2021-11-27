@@ -18,17 +18,24 @@ namespace DBManager
 		private readonly string _sql;
 		private readonly MySqlParameter[] _parameters;
 		private readonly DBHelper _dbHelper;
+		private readonly QueryType _qt;
 
 		/// <summary>
 		/// Initilises the Query
 		/// </summary>
 		/// <param name="helper">the DBHelper to interact with the databse with</param>
-		/// <param name="sql">the sql query to run</param>
+		/// <param name="query">the sql query to run</param>
 		/// <param name="options">the parameters to apply to the query</param>
-		public Query(DBHelper helper, string sql, params MySqlParameter[] options)
+		public Query(DBHelper helper, string query, QueryType queryType, params MySqlParameter[] options)
 		{
 			_dbHelper = helper;
-			_sql = sql;
+			_sql = queryType switch
+			{
+				QueryType.Embedded => helper.Sql[query],
+				QueryType.RawSql => query,
+				QueryType.Table => $"Select * from {query};",
+				_ => throw new ArgumentException("Invalid enum value", nameof(queryType))
+			};
 			_parameters = options;
 
 			if (_map.Count >= 1)
