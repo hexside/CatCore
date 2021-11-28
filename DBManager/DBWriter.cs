@@ -17,12 +17,12 @@ public class DBWriter<T>
 {
 	private static Dictionary<PropertyInfo, string> _map = new();
 
-	private DBHelper _helper;
-	private string _sql;
-	private List<MySqlParameter> _parameters;
-	private T _obj;
-	private WriteAction _action;
-	private string _table;
+	private readonly DBHelper _helper;
+	private readonly string _sql;
+	private readonly List<MySqlParameter> _parameters;
+	private readonly T _obj;
+	private readonly WriteAction _action;
+	private readonly string _table;
 
 	public DBWriter(DBHelper helper, string table, T obj, WriteAction action)
 	{
@@ -47,7 +47,7 @@ public class DBWriter<T>
 	private List<MySqlParameter> _readParameters()
 		=> _map.Select(x => new MySqlParameter(x.Value, x.Key.GetValue(_obj))).ToList();
 
-	private void _validateMap()
+	private static void _validateMap()
 		=> _map = _map.Count < 1
 			? _readMap()
 			: _map;

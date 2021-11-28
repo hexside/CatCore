@@ -17,7 +17,7 @@ public class DBReader<T>
 {
 
 	private static Dictionary<string, PropertyInfo> _map = new();
-	private string _sql;
+	private readonly string _sql;
 	private readonly MySqlParameter[] _parameters;
 	private readonly DBHelper _dbHelper;
 
