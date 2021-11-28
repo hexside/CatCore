@@ -62,5 +62,8 @@ namespace DBManager
 			string serialised = JsonSerializer.Serialize(obj, options);
 			return JsonSerializer.Deserialize<T>(serialised);
 		}
+
+		public static string GetString(this IEnumerable<MySqlParameter> p)
+			=> ("PARAMS: \n" + string.Concat(p.Select(x => $"	{x.ParameterName}={x.Value};\n")))[..^1];
 	}
 }

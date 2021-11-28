@@ -128,5 +128,8 @@ namespace DBManager
 
 		public async Task AddUserAsync(ulong userId, bool isDev)
 			=> await new DBWriter<User>(this, "users", new User(isDev, userId), WriteAction.Add).RunAsync();
+
+		public async Task RemoveUserAsync(User user)
+			=> await new DBWriter<User>(this, "users", user, WriteAction.Remove).RunAsync();
 	}
 }

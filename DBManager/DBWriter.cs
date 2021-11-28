@@ -33,8 +33,7 @@ public class DBWriter<T>
 		_validateMap();
 		_parameters = _readParameters();
 		_sql = _readSql();
-		Console.WriteLine(_sql);
-		Console.WriteLine("PARAMS: " + string.Concat(_parameters.Select(x => $"{x.ParameterName}={x.Value};\n")));
+		_helper._logger.LogDebug($"Running the query {_sql}\n{_parameters.GetString()}").ConfigureAwait(false);
 	}
 
 	private static Dictionary<PropertyInfo, string> _readMap() => typeof(T)
@@ -57,6 +56,8 @@ public class DBWriter<T>
 		WriteAction.Add => $"INSERT INTO {_table}" +
 			$"({string.Concat(_parameters.Select(x => x.ParameterName.Cp() + ", "))[..^2]}) value " +
 			$"({string.Concat(_parameters.Select(x => $"@{x.ParameterName.Cp()}, "))[..^2]});",
+		WriteAction.Remove => $"DELETE FROM {_table} where (" + string.Concat(_parameters.Select(x =>
+				$"{x.ParameterName.Cp()}=@{x.ParameterName.Cp()} and "))[..^5] + ")",
 		_ => throw new NotImplementedException()
 	};
 

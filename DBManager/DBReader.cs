@@ -19,7 +19,7 @@ public class DBReader<T>
 	private static Dictionary<string, PropertyInfo> _map = new();
 	private readonly string _sql;
 	private readonly MySqlParameter[] _parameters;
-	private readonly DBHelper _dbHelper;
+	private readonly DBHelper _helper;
 
 	/// <summary>
 	///		Initilises the Query
@@ -36,7 +36,7 @@ public class DBReader<T>
 	/// <param name="options">the parameters to apply to the query</param>
 	public DBReader(DBHelper helper, string query, ReadAction queryType, params MySqlParameter[] options)
 	{
-		_dbHelper = helper;
+		_helper = helper;
 		_sql = queryType switch
 		{
 			ReadAction.Embedded => helper.Sql[query],
@@ -52,14 +52,14 @@ public class DBReader<T>
 				$"@{x.ParameterName.Cp()} and "))[..^4] + ";";
 		}
 
-		Console.WriteLine(_sql);
-
 		_parameters = options;
 
 		if (_map.Count >= 1)
 		{
 			_map = _readMap();
 		}
+
+		_helper._logger.LogDebug($"Running the query {_sql}\n{_parameters.GetString()}").ConfigureAwait(false);
 	}
 
 	private static Dictionary<string, PropertyInfo> _readMap() => typeof(T)
@@ -78,8 +78,7 @@ public class DBReader<T>
 	/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
 	public async Task<List<T>> RunAsync(T tBase)
 	{
-		Console.WriteLine(_sql);
-		MySqlDataReader reader = await _dbHelper.RunQueryAsync(_sql, _parameters);
+		MySqlDataReader reader = await _helper.RunQueryAsync(_sql, _parameters);
 		List<T> result = ParseReader(reader, tBase);
 		reader.Dispose();
 		return result;
