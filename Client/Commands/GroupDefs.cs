@@ -22,7 +22,7 @@ namespace Client.Commands
 		}
 	}
 	[Group("pronoun", "command related to managing your pronouns.")]
-	public partial class Pronouns : InteractionModuleBase<SocketInteractionContext>
+	public partial class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 	{
 		public DBHelper DBHelper { get; set; }
 	}

@@ -29,10 +29,10 @@ namespace Client.Commands
 					: type switch
 					{
 						// use a fancy json conversion if possible
-						SqlResultType.User => JsonSerializer.Serialize(
+						SqlResultType.User => JsonSerializer.Serialize<List<User>>(
 							new DBReader<User>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
-						SqlResultType.Pronoun => JsonSerializer.Serialize(
-							new DBReader<Pronoun>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
+						SqlResultType.Pronoun => JsonSerializer.Serialize<List<DBManager.Pronoun>>(
+							new DBReader<DBManager.Pronoun>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						// when that fails fallback on the legacy behavior
 						_ => (await DBHelper.RunQueryAsync(command)).ReadAsText(2000)
 					};

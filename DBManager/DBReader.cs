@@ -123,7 +123,9 @@ public class DBReader<T>
 			{
 				if (_map.GetValueOrDefault(reader.GetName(j).ToLower(), null) is PropertyInfo info)
 				{
-					info.SetValue(result[i], reader[j]);
+					object value = reader[j];
+					object item = result[i];
+					info.SetValue(item, value);
 				}
 			}
 		}

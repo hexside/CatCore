@@ -53,10 +53,7 @@ namespace DBManager
 			JsonSerializerOptions options = new()
 			{
 				AllowTrailingCommas = true,
-				IgnoreReadOnlyFields = false,
-				IgnoreReadOnlyProperties = false,
 				IncludeFields = true,
-				PropertyNameCaseInsensitive = false,
 				WriteIndented = false,
 			};
 			string serialised = JsonSerializer.Serialize(obj, options);

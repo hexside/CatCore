@@ -12,7 +12,7 @@ namespace DBManager
 		[SqlReadonly]
 		[SqlColumn("id")]
 		public ulong Id { get; set; }
-		private string _subject;
+		private string _subject = "";
 		[SqlColumn("subject")]
 		public string Subject
 		{
@@ -21,7 +21,7 @@ namespace DBManager
 				? value
 				: throw new ArgumentException("cannot write to _subject because value is to long");
 		}
-		private string _object;
+		private string _object = "";
 		[SqlColumn("object")]
 		public string Object
 		{
@@ -30,7 +30,7 @@ namespace DBManager
 				? value
 				: throw new ArgumentException("cannot write to _object because value is to long");
 		}
-		private string _possesive;
+		private string _possesive = "";
 		[SqlColumn("possesive")]
 		public string Possesive
 		{
@@ -39,7 +39,7 @@ namespace DBManager
 				? value
 				: throw new ArgumentException("cannot write to _possesive because value is to long");
 		}
-		private string _reflexive;
+		private string _reflexive = "";
 		[SqlColumn("reflexive")]
 		public string Reflexive
 		{
