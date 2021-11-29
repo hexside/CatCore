@@ -59,6 +59,7 @@ namespace DBManager
 			0x11 => $"{_subject}/{_object}",
 			0x12 => $"{_subject}/{_object}/{_possesive}",
 			0x13 => $"{_subject}/{_object}/{_possesive}/{_reflexive}",
+			_ => ToString()
 		};
 	}
 }

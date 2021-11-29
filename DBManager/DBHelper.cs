@@ -4,7 +4,7 @@ using MySql;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Net;
-using CottageDwellingAdditions;
+using Utils;
 using System.Reflection;
 using System.IO;
 using Discord;
@@ -18,12 +18,17 @@ namespace DBManager
 	/// </summary>
 	public class DBHelper
 	{
+		private Cached<List<Pronoun>> _pronouns;
+
 		internal string _connectionString;
 		/// <summary>
 		/// This does not support load balencing and should only be used for pinging the server.
 		/// </summary>
 		internal MySqlConnection _connection;
 		internal Logger _logger;
+		/// <summary>
+		/// Stores cached versions of embeded sql queries
+		/// </summary>
 		public Dictionary<string, string> Sql { get; private set; }
 		
 		public event Func<LogMessage, Task> Log;
@@ -65,6 +70,9 @@ namespace DBManager
 				_logger.LogDebug($"adding the sql file {cleanName}").ConfigureAwait(false);
 				Sql.Add(cleanName, reader.ReadToEnd());
 			});
+
+			_logger.LogDebug("Caching high value queries").ConfigureAwait(false);
+			_pronouns = new(() => GetPronounsAsync().Result);
 		}
 
 		/// <summary>
@@ -136,7 +144,9 @@ namespace DBManager
 		/// </summary>
 		/// <returns>every pronoun in the db.</returns>
 		public async Task<List<Pronoun>> GetPronounsAsync()
-			=> await new DBReader<Pronoun>(this, "pronouns", ReadAction.Table).RunAsync(new());
+			=> _pronouns is null || _pronouns.Valid == false
+				? await new DBReader<Pronoun>(this, "pronouns", ReadAction.Table).RunAsync(new())
+				: _pronouns.Value;
 
 		/// <summary>
 		/// Adds a new user
@@ -158,8 +168,10 @@ namespace DBManager
 		/// </summary>
 		/// <param name="pronoun">the pronoun to add</param>
 		public async Task AddPronounAsync(Pronoun pronoun)
-			=> await new DBWriter<Pronoun>(this, "pronouns", pronoun, WriteAction.Add).RunAsync();
-
+		{
+			_pronouns.Valid = false;
+			await new DBWriter<Pronoun>(this, "pronouns", pronoun, WriteAction.Add).RunAsync();
+		}
 		/// <summary>
 		/// Checks if a pronoun is a duplicate
 		/// </summary>
