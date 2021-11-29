@@ -11,6 +11,11 @@ using Discord;
 
 namespace DBManager
 {
+	/// <summary>
+	/// A abstrasction layer for <see cref="DBReader{T}"/> and <see cref="DBWriter{T}"/>
+	/// that provides easy acess to commen queries, and handles connection pooling
+	/// automaticly
+	/// </summary>
 	public class DBHelper
 	{
 		internal string _connectionString;
@@ -114,7 +119,7 @@ namespace DBManager
 			=> (await new DBReader<User>(this, "users", ReadAction.Table,
 				new MySqlParameter("discordId", discordId))
 				.RunAsync(new()))
-				.First();
+				.FirstOrDefault((User)null);
 
 		/// <summary>
 		/// Get a users pronouns
@@ -126,10 +131,73 @@ namespace DBManager
 				new MySqlParameter("userId", userId))
 				.RunAsync(new());
 
+		/// <summary>
+		/// Gets all pronouns
+		/// </summary>
+		/// <returns>every pronoun in the db.</returns>
+		public async Task<List<Pronoun>> GetPronounsAsync()
+			=> await new DBReader<Pronoun>(this, "pronouns", ReadAction.Table).RunAsync(new());
+
+		/// <summary>
+		/// Adds a new user
+		/// </summary>
+		/// <param name="userId">the users discord id</param>
+		/// <param name="isDev">true if the user is a dev, otherwise false</param>
 		public async Task AddUserAsync(ulong userId, bool isDev)
 			=> await new DBWriter<User>(this, "users", new User(isDev, userId), WriteAction.Add).RunAsync();
 
+		/// <summary>
+		/// remove a user
+		/// </summary>
+		/// <param name="user">the user to remove</param>
 		public async Task RemoveUserAsync(User user)
 			=> await new DBWriter<User>(this, "users", user, WriteAction.Remove).RunAsync();
+
+		/// <summary>
+		/// Adds a pronoun to the database
+		/// </summary>
+		/// <param name="pronoun">the pronoun to add</param>
+		public async Task AddPronounAsync(Pronoun pronoun)
+			=> await new DBWriter<Pronoun>(this, "pronouns", pronoun, WriteAction.Add).RunAsync();
+
+		/// <summary>
+		/// Checks if a pronoun is a duplicate
+		/// </summary>
+		/// <param name="pronoun">the pronoun to check</param>
+		/// <returns>true if the pronoun is a duplicate; otherwise false</returns>
+		public async Task<bool> DuplicatePronoun(Pronoun pronoun)
+			 => (await new DBReader<Pronoun>(this, "pronouns", ReadAction.Table,
+				new("subject", pronoun.Subject),
+				new("object", pronoun.Object),
+				new("possesive", pronoun.Possesive),
+				new("reflexive", pronoun.Reflexive))
+			.RunAsync(new()))
+			.Any();
+
+		/// <summary>
+		/// Get a pronoun by its id
+		/// </summary>
+		/// <param name="id">the pronouns id</param>
+		/// <returns>the pronoun</returns>
+		public async Task<Pronoun> GetPronounAsync(ulong id)
+			=> (await new DBReader<Pronoun>(this, "pronouns", ReadAction.Table, new MySqlParameter("id", id))
+			.RunAsync(new()))
+			.First();
+
+		/// <summary>
+		/// Adds a pronoun to a user
+		/// </summary>
+		/// <param name="pronounId">The id of the pronoun</param>
+		/// <param name="userId">The id of the user</param>
+		public async Task AddUserPronounAsync(ulong pronounId, ulong userId)
+			=> await new DBWriter<UserPronoun>(this, "userPronouns", new(pronounId, userId), WriteAction.Add).RunAsync();
+
+		/// <summary>
+		/// Removes a pronoun from a user
+		/// </summary>
+		/// <param name="pronounId">The id of the pronoun</param>
+		/// <param name="userId">The id of the user</param>
+		public async Task RemoveUserPronounAsync(ulong pronounId, ulong userId)
+			=> await new DBWriter<UserPronoun>(this, "userPronouns", new(pronounId, userId), WriteAction.Remove).RunAsync();
 	}
 }

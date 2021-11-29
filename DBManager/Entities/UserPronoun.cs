@@ -8,10 +8,15 @@ namespace DBManager
 {
 	public class UserPronoun
 	{
-		[SqlReadonly]
 		[SqlColumn("pronounId")]
 		public ulong PronounId { get; set; }
 		[SqlColumn("userId")]
 		public ulong UserId { get; set; }
+
+		public UserPronoun(ulong pronoun, ulong user)
+		{
+			PronounId = pronoun;
+			UserId = user;
+		}
 	}
 }
