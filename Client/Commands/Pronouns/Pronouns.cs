@@ -28,7 +28,7 @@ public partial class PronounCommands
 		string responce = pronouns.Count switch
 		{
 			0 => $"{user.Mention} did not specify their pronouns, have them run `/pronoun add` to set them",
-			_ => $@"{user.Mention}'s pronouns are {string.Concat(pronouns.Select(x => $"**{x.ToString(0x11)}**, "))
+			_ => $@"{user.Mention}'s pronouns are {string.Concat(pronouns.Select(x => $"**{x:s, o}**, "))
 					[..^2].ReplaceLast(",", " and")}"
 		};
 

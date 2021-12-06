@@ -51,15 +51,15 @@ namespace DBManager
 
 		public override string ToString() => $"{_subject}/{_object}/{_possesive}/{_reflexive}";
 
-		public string ToString(int form) => form switch
+		public string ToString(string format, params object[] args)
 		{
-			0x01 => $"{_subject}, {_object}",
-			0x02 => $"{_subject}, {_object}, {_possesive}",
-			0x03 => $"{_subject}, {_object}, {_possesive}, {_reflexive}",
-			0x11 => $"{_subject}/{_object}",
-			0x12 => $"{_subject}/{_object}/{_possesive}",
-			0x13 => $"{_subject}/{_object}/{_possesive}/{_reflexive}",
-			_ => ToString()
-		};
+			for (int i = 0; i < args.Length; i++) format = format.Replace($"{{{i}}}", args[i].ToString());
+			format = format
+				.Replace("s", _subject)
+				.Replace("o", _object)
+				.Replace("p", _possesive)
+				.Replace("r", _reflexive);
+			return format;
+		}
 	}
 }

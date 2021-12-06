@@ -22,7 +22,7 @@ public partial class PronounCommands
 		Pronoun pronoun = await DBHelper.GetPronounAsync(Convert.ToUInt64(pronounId));
 		User user = await DBHelper.GetUserAsync(Context.User.Id);
 		await DBHelper.RemoveUserPronounAsync(pronoun.Id, user.InternalId);
-		await RespondAsync($"removed **{pronoun.ToString(0x03)}** from your profile", ephemeral: true,
+		await RespondAsync($"removed **{pronoun:s/o/p/r}** from your profile", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
 	}
 }

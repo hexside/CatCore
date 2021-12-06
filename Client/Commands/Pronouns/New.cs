@@ -38,6 +38,6 @@ public partial class PronounCommands
 		}
 
 		await DBHelper.AddPronounAsync(pronoun);
-		await RespondAsync($"created the pronoun **{pronoun.ToString(0x13)}**", ephemeral:true);
+		await RespondAsync($"created the pronoun **{pronoun:s/o/p/r}**", ephemeral:true);
 	}
 }

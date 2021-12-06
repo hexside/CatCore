@@ -34,7 +34,7 @@ internal class PronounAutocompleteProvider : AutocompleteHandler
 			? pronouns.GetRange(0, 20)
 			: pronouns;
 
-		return AutocompletionResult.FromSuccess(pronouns.Select(x => new AutocompleteResult(x.ToString(0x02), 
+		return AutocompletionResult.FromSuccess(pronouns.Select(x => new AutocompleteResult(x.ToString("s/o/p/r"), 
 			x.Id.ToString())));
 	}
 

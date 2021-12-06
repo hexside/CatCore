@@ -22,7 +22,7 @@ public partial class PronounCommands
 		Pronoun pronoun = await DBHelper.GetPronounAsync(Convert.ToUInt64(pronounId));
 		User user = await DBHelper.GetUserAsync(Context.User.Id);
 		await DBHelper.AddUserPronounAsync(pronoun.Id, user.InternalId);
-		await RespondAsync($"added **{pronoun.ToString(0x13)}** to your profile", ephemeral: true,
+		await RespondAsync($"added **{pronoun:s/o/p}** to your profile", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
 	}
 }
