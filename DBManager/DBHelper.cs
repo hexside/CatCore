@@ -211,5 +211,53 @@ namespace DBManager
 		/// <param name="userId">The id of the user</param>
 		public async Task RemoveUserPronounAsync(ulong pronounId, ulong userId)
 			=> await new DBWriter<UserPronoun>(this, "userPronouns", new(pronounId, userId), WriteAction.Remove).RunAsync();
+
+		/// <summary>
+		/// Gets a poll from the database
+		/// </summary>
+		/// <param name="id">the polls id</param>
+		/// <returns>The poll.</returns>
+		public async Task<Poll> GetPollAsync(ulong id)
+			=> (await new DBReader<Poll>(this, "polls", ReadAction.Table, new MySqlParameter("id", id))
+				.RunAsync(new()))
+				.First();
+
+		/// <summary>
+		/// Gets polls from a guild
+		/// </summary>
+		/// <param name="guildId">the guild to get polls from</param>
+		/// <returns>all the polls in the guild</returns>
+		public async Task<List<Poll>> GetGuildPollsAsync(ulong guildId)
+			=> await new DBReader<Poll>(this, "polls", ReadAction.Table, new MySqlParameter("guildId", guildId))
+				.RunAsync(new());
+
+		/// <summary>
+		/// Gets the roles from a poll
+		/// </summary>
+		/// <param name="pollId">the polls id</param>
+		/// <returns>all the roles in a poll</returns>
+		public async Task<List<PollRole>> GetPollRolesAsync(ulong pollId)
+			=> await new DBReader<PollRole>(this, "pollRoles", ReadAction.Table, new MySqlParameter("pollId", pollId))
+				.RunAsync(new());
+
+		/// <summary>
+		/// gets a poll role
+		/// </summary>
+		/// <param name="id">the roles id</param>
+		/// <returns>the pollrole</returns>
+		public async Task<PollRole> GetPollRoleAsync(ulong id)
+			=> (await new DBReader<PollRole>(this, "pollRoles", ReadAction.Table, new MySqlParameter("id", id))
+				.RunAsync(new()))
+				.First();
+
+		/// <summary>
+		/// Adds a poll to the db
+		/// </summary>
+		/// <param name="poll">the poll to add</param>
+		public async Task AddPollAsync(Poll poll)
+			=> await new DBWriter<Poll>(this, "polls", poll, WriteAction.Add).RunAsync();
+
+		public async Task AddPollRoleAsync(PollRole role)
+			=> await new DBWriter<PollRole>(this, "pollRoles", role, WriteAction.Add).RunAsync();
 	}
 }

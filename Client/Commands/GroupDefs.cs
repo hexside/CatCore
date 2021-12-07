@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
+using Discord.WebSocket;
 using DBManager;
 
 namespace Client.Commands
@@ -26,5 +27,14 @@ namespace Client.Commands
 	{
 		public DBHelper DBHelper { get; set; }
 	}
+
+	[Group("poll", "command for creating and managing polls")]
+	public partial class PollCommands : InteractionModuleBase<SocketInteractionContext>
+	{
+		public DiscordSocketClient Client { get; set; }
+		public DBHelper DBHelper { get; set; }
+	}
+
+	
 	public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext> { }
 }

@@ -51,7 +51,7 @@ public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext>
 		string invite = "discord://discord.gg/" + (await channel.CreateInviteToApplicationAsync(id, 21600)).Code;
 		ComponentBuilder cb = new ComponentBuilder()
 			.WithButton("Join the activity", style: ButtonStyle.Link, url: invite);
-		await Context.Interaction.RespondAsync("click the button below to launch the activity", component: cb.Build());
+		await Context.Interaction.RespondAsync("click the button below to launch the activity", components: cb.Build());
 	}
 
 	public class ActivityAutocompleteProvider : AutocompleteHandler
