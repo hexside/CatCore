@@ -27,7 +27,7 @@ namespace DBManager
 		internal MySqlConnection _connection;
 		internal Logger _logger;
 		/// <summary>
-		/// Stores cached versions of embeded sql queries
+		/// Stores cached versions of embedded sql queries
 		/// </summary>
 		public Dictionary<string, string> Sql { get; private set; }
 		
@@ -44,7 +44,7 @@ namespace DBManager
 			// validate the string
 			if (!_connection.Ping())
 			{
-				string error = "The databse is ofline or the connection string is invalid";
+				string error = "The database is offline or the connection string is invalid";
 				throw new ArgumentException(error, nameof(connectionString));
 			}
 		}
@@ -202,7 +202,7 @@ namespace DBManager
 		/// <param name="pronounId">The id of the pronoun</param>
 		/// <param name="userId">The id of the user</param>
 		public async Task AddUserPronounAsync(ulong pronounId, ulong userId)
-			=> await new DBWriter<UserPronoun>(this, "userPronouns", new(pronounId, userId), WriteAction.Add).RunAsync();
+			=> await new DBWriter<UserPronoun>(this, "userpronouns", new(pronounId, userId), WriteAction.Add).RunAsync();
 
 		/// <summary>
 		/// Removes a pronoun from a user
@@ -210,7 +210,7 @@ namespace DBManager
 		/// <param name="pronounId">The id of the pronoun</param>
 		/// <param name="userId">The id of the user</param>
 		public async Task RemoveUserPronounAsync(ulong pronounId, ulong userId)
-			=> await new DBWriter<UserPronoun>(this, "userPronouns", new(pronounId, userId), WriteAction.Remove).RunAsync();
+			=> await new DBWriter<UserPronoun>(this, "userpronouns", new(pronounId, userId), WriteAction.Remove).RunAsync();
 
 		/// <summary>
 		/// Gets a poll from the database
@@ -237,7 +237,7 @@ namespace DBManager
 		/// <param name="pollId">the polls id</param>
 		/// <returns>all the roles in a poll</returns>
 		public async Task<List<PollRole>> GetPollRolesAsync(ulong pollId)
-			=> await new DBReader<PollRole>(this, "pollRoles", ReadAction.Table, new MySqlParameter("pollId", pollId))
+			=> await new DBReader<PollRole>(this, "pollroles", ReadAction.Table, new MySqlParameter("pollId", pollId))
 				.RunAsync(new());
 
 		/// <summary>
@@ -246,7 +246,7 @@ namespace DBManager
 		/// <param name="id">the roles id</param>
 		/// <returns>the pollrole</returns>
 		public async Task<PollRole> GetPollRoleAsync(ulong id)
-			=> (await new DBReader<PollRole>(this, "pollRoles", ReadAction.Table, new MySqlParameter("id", id))
+			=> (await new DBReader<PollRole>(this, "pollroles", ReadAction.Table, new MySqlParameter("id", id))
 				.RunAsync(new()))
 				.First();
 
@@ -258,6 +258,6 @@ namespace DBManager
 			=> await new DBWriter<Poll>(this, "polls", poll, WriteAction.Add).RunAsync();
 
 		public async Task AddPollRoleAsync(PollRole role)
-			=> await new DBWriter<PollRole>(this, "pollRoles", role, WriteAction.Add).RunAsync();
+			=> await new DBWriter<PollRole>(this, "pollroles", role, WriteAction.Add).RunAsync();
 	}
 }

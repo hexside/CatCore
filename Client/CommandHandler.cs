@@ -43,7 +43,7 @@ namespace Client
 		{
 			if (result.IsSuccess)
 			{
-				await _logger.LogDebug($"sucesfully executed the command {command.Name}");
+				await _logger.LogDebug($"Successfully executed the command {command.Name}");
 			}
 			else
 			{
@@ -51,23 +51,33 @@ namespace Client
 			}
 		}
 
-		private async Task _interactionFailHandle(string name, IResult result, IDiscordInteraction interaction)
+		private async Task _interactionFailHandle(string name, IResult result, IDiscordInteraction discordInteraction)
 		{
-			string error = $"the interaction {name} failed with the error type {result.Error} : {result.ErrorReason}";
-			await _logger.LogWarning(error);
-			// try responding to the interaction
-			try
+			string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"} error \n```\n{result?.ErrorReason}\n```";
+			// TODO: remove this once casting is not required
+			if (discordInteraction is not SocketInteraction sInteraction)
 			{
-				await interaction.RespondAsync(error, ephemeral: true);
+				try
+				{
+					await discordInteraction.RespondAsync(error, ephemeral: true);
+				}
+				catch (Exception ex)
+				{
+					await _logger.LogError("failed to respond to a command", ex).ConfigureAwait(false);
+					await discordInteraction.FollowupAsync(error, ephemeral: true);
+				}
 			}
-			catch (Exception ex)
+			else if (!sInteraction.HasResponded)
 			{
-				Console.Error.WriteLine(ex);
-				await interaction.FollowupAsync(error, ephemeral:true);
+				await sInteraction.RespondAsync(error, ephemeral: true);
+			}
+			else
+			{
+				await sInteraction.FollowupAsync(error, ephemeral: true);
 			}
 		}
 
-		private async Task _handleInteraction (SocketInteraction interaction)
+		private async Task _handleInteraction(SocketInteraction interaction)
 		{
 			var context = new SocketInteractionContext(_client, interaction);
 			await _interactionService.ExecuteCommandAsync(context, _services);
