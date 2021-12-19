@@ -22,7 +22,7 @@ public partial class PronounCommands
 			internalId = (await DBHelper.GetUserAsync(user.Id)).InternalId;
 		}
 
-		List<Pronoun> pronouns = await DBHelper.GetPronounsAsync(internalId.Value);
+		List<Pronoun> pronouns = await DBHelper.GetUsersPronounsAsync(internalId.Value);
 
 		string responce = pronouns.Count switch
 		{

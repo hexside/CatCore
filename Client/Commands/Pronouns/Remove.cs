@@ -17,6 +17,7 @@ public partial class PronounCommands
 	public async Task Remove(
 		[Summary("remove", "the pronoun to remove")]
 		[Autocomplete(typeof(PronounAutocompleteProvider))]
+		[AutocompleteFromUserAtribute]
 		string pronounId)
 	{
 		Pronoun pronoun = await DBHelper.GetPronounAsync(Convert.ToUInt64(pronounId));

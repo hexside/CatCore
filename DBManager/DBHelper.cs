@@ -134,7 +134,7 @@ namespace DBManager
 		/// </summary>
 		/// <param name="userId">the Id of the user to get pronouns from</param>
 		/// <returns>the pronouns the user has specified</returns>
-		public async Task<List<Pronoun>> GetPronounsAsync(ulong userId)
+		public async Task<List<Pronoun>> GetUsersPronounsAsync(ulong userId)
 			=> await new DBReader<Pronoun>(this, "GetPronounsFromUserId", ReadAction.Embedded,
 				new MySqlParameter("userId", userId))
 				.RunAsync(new());
@@ -181,7 +181,7 @@ namespace DBManager
 			 => (await new DBReader<Pronoun>(this, "pronouns", ReadAction.Table,
 				new("subject", pronoun.Subject),
 				new("object", pronoun.Object),
-				new("possesive", pronoun.Possesive),
+				new("possessive", pronoun.Possessive),
 				new("reflexive", pronoun.Reflexive))
 			.RunAsync(new()))
 			.Any();

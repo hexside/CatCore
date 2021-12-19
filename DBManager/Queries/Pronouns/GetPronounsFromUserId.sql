@@ -2,7 +2,7 @@
 	pronouns.id, 
 	pronouns.subject, 
     pronouns.object, 
-    pronouns.possesive, 
+    pronouns.possessive, 
     pronouns.reflexive 
 from 
 	pronouns,

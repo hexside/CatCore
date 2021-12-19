@@ -20,8 +20,8 @@ internal class PronounAutocompleteProvider : AutocompleteHandler
 		// gets and sorts the pronouns, didn't even know you could chain contidionals like this
 		pronouns = parameter.Attributes.Any(x => x is AutocompleteFromUserAtribute)
 			? currentValue == ""
-                ? (await DBHelper.GetPronounsAsync((await DBHelper.GetUserAsync(context.User.Id)).InternalId))
-                : (await DBHelper.GetPronounsAsync((await DBHelper.GetUserAsync(context.User.Id)).InternalId))
+                ? (await DBHelper.GetUsersPronounsAsync((await DBHelper.GetUserAsync(context.User.Id)).InternalId))
+                : (await DBHelper.GetUsersPronounsAsync((await DBHelper.GetUserAsync(context.User.Id)).InternalId))
                     .Where(x => x.ToString().Contains(currentValue, StringComparison.InvariantCultureIgnoreCase))
                     .ToList()
 			: currentValue == ""

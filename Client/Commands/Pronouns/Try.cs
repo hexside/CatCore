@@ -21,7 +21,7 @@ public partial class PronounCommands
 	{
 		Pronoun pronoun = await DBHelper.GetPronounAsync(Convert.ToUInt64(pronounId));
 		await RespondAsync($"Have you seen {Context.User.Mention}'s latest project? " +
-			$"**{pronoun.Subject}** made a really pretty necklace that looks like **{pronoun.Possesive}** cats hugging." +
+			$"**{pronoun.Subject}** made a really pretty necklace that looks like **{pronoun.Possessive}** cats hugging." +
 			$" I wish I spent more time on projects like **{pronoun.Object}**.", ephemeral: true, 
 			allowedMentions:AllowedMentions.None);
 	}

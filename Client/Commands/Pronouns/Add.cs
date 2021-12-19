@@ -21,6 +21,14 @@ public partial class PronounCommands
 	{
 		Pronoun pronoun = await DBHelper.GetPronounAsync(Convert.ToUInt64(pronounId));
 		User user = await DBHelper.GetUserAsync(Context.User.Id);
+		
+		List<Pronoun> pronouns = await DBHelper.GetUsersPronounsAsync(user.InternalId);
+		if (pronouns.Any(x => x.Id == pronoun.Id))
+		{
+			await RespondAsync("You already have that pronoun", ephemeral: true);
+			return;
+		}
+		
 		await DBHelper.AddUserPronounAsync(pronoun.Id, user.InternalId);
 		await RespondAsync($"added **{pronoun:s/o/p}** to your profile", ephemeral: true,
 			allowedMentions: AllowedMentions.None);

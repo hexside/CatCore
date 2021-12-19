@@ -18,8 +18,8 @@ public partial class PronounCommands
 	string subject,
 	[Summary("object", "Them in \"I love going to the park with them.\"")]
 	string @object,
-	[Summary("possesive", "Theirs in \"That sandwich is theirs.\"")]
-	string possesive,
+	[Summary("possessive", "Theirs in \"That sandwich is theirs.\"")]
+	string possessive,
 	[Summary("reflexive", "Themself in \"They used to go on walks by themself; but now we mostly go together.\"")]
 	string reflexive)
 	{
@@ -27,7 +27,7 @@ public partial class PronounCommands
 		{
 			Subject = subject,
 			Object = @object,
-			Possesive = possesive,
+			Possessive = possessive,
 			Reflexive = reflexive
 		};
 

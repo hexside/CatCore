@@ -30,14 +30,14 @@ namespace DBManager
 				? value
 				: throw new ArgumentException("cannot write to _object because value is to long");
 		}
-		private string _possesive = "";
-		[SqlColumn("possesive")]
-		public string Possesive
+		private string _possessive = "";
+		[SqlColumn("possessive")]
+		public string Possessive
 		{
-			get => _possesive;
-			set => _possesive = value.Length < 50
+			get => _possessive;
+			set => _possessive = value.Length < 50
 				? value
-				: throw new ArgumentException("cannot write to _possesive because value is to long");
+				: throw new ArgumentException("cannot write to _possessive because value is to long");
 		}
 		private string _reflexive = "";
 		[SqlColumn("reflexive")]
@@ -46,10 +46,10 @@ namespace DBManager
 			get => _reflexive;
 			set => _reflexive = value.Length < 50
 				? value
-				: throw new ArgumentException("cannot write to _possesive because value is to long");
+				: throw new ArgumentException("cannot write to _reflexive because value is to long");
 		}
 
-		public override string ToString() => $"{_subject}/{_object}/{_possesive}/{_reflexive}";
+		public override string ToString() => $"{_subject}/{_object}/{_possessive}/{_reflexive}";
 
 		public string ToString(string format)
 		{
@@ -59,7 +59,7 @@ namespace DBManager
 				.Replace("p", "{2}")
 				.Replace("r", "{3}");
 				
-			return string.Format(format, _subject, _object, _possesive, _reflexive);
+			return string.Format(format, _subject, _object, _possessive, _reflexive);
 		}
 	}
 }
