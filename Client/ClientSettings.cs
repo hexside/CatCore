@@ -28,11 +28,11 @@ namespace Client
 		{
 			var _this = JsonSerializer.Deserialize<ClientSettings>(File.ReadAllText(fileLocation), _options);
 
-			this.Token = _this.Token.Trim();
-			this.WebhookUrl = _this.WebhookUrl.Trim();
-			this.DebugGuildId = _this.DebugGuildId;
-			this.DebugMode = _this.DebugMode;
-			this.DBConnectionString = _this.DBConnectionString;
+			Token = _this.Token.Trim();
+			WebhookUrl = _this.WebhookUrl.Trim();
+			DebugGuildId = _this.DebugGuildId;
+			DebugMode = _this.DebugMode;
+			DBConnectionString = _this.DBConnectionString;
 		}
 		public ClientSettings() { }
 	}
