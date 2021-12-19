@@ -12,9 +12,9 @@ using Discord;
 namespace DBManager
 {
 	/// <summary>
-	/// A abstrasction layer for <see cref="DBReader{T}"/> and <see cref="DBWriter{T}"/>
-	/// that provides easy acess to commen queries, and handles connection pooling
-	/// automaticly
+	/// A abstraction layer for <see cref="DBReader{T}"/> and <see cref="DBWriter{T}"/>
+	/// that provides easy access to commen queries, and handles connection pooling
+	/// automatically
 	/// </summary>
 	public class DBHelper
 	{
@@ -85,7 +85,7 @@ namespace DBManager
 			=> await MySqlHelper.ExecuteReaderAsync(_connectionString, sql, options);
 
 		/// <summary>
-		///		Runs a myswl Query and returns the rows effected.
+		///		Runs a mysql Query and returns the rows effected.
 		/// </summary>
 		/// <param name="sql">the query to run</param>
 		/// <param name="options">the options for the query</param>
@@ -103,7 +103,7 @@ namespace DBManager
 			=> MySqlHelper.ExecuteReader(_connectionString, sql, options);
 
 		/// <summary>
-		///		Runs a myswl Query and returns the rows effected.
+		///		Runs a mysql Query and returns the rows effected.
 		/// </summary>
 		/// <param name="sql">the query to run</param>
 		/// <param name="options">the options for the query</param>
@@ -114,7 +114,7 @@ namespace DBManager
 		/// <summary>
 		/// Pings the server
 		/// </summary>
-		/// <returns>true of the server is avilible, otherwise false</returns>
+		/// <returns>true of the server is availble, otherwise false</returns>
 		public bool Ping()
 			=> _connection.Ping();
 

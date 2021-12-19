@@ -11,7 +11,7 @@ namespace Client.Commands;
 public partial class PollCommands
 {
 	[ComponentInteraction("poll.*.result", true)]
-	public async Task AddPollRole(string id, string[] values)
+	public async Task AddPollRole(string id)
 	{
 		await RespondAsync(id);
 	}

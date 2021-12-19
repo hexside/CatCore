@@ -17,7 +17,7 @@ internal class PronounAutocompleteProvider : AutocompleteHandler
 		List<Pronoun> pronouns = new();
 		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
 
-		// gets and sorts the pronouns, didn't even know you could chain contidionals like this
+		// gets and sorts the pronouns, didn't even know you could chain conditionals like this
 		pronouns = parameter.Attributes.Any(x => x is AutocompleteFromUserAtribute)
 			? currentValue == ""
                 ? (await DBHelper.GetUsersPronounsAsync((await DBHelper.GetUserAsync(context.User.Id)).InternalId))

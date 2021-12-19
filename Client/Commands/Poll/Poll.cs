@@ -15,7 +15,7 @@ namespace Client.Commands
 	public partial class PollCommands
 	{ 
 		[ComponentInteraction("poll.*.launch", true)]
-		public async Task RespndWithPoll(string id)
+		public async Task RespondWithPoll(string id)
 		{
 			Poll poll = await DBHelper.GetPollAsync(Convert.ToUInt64(id));
 			List<PollRole> pollRoles = await DBHelper.GetPollRolesAsync(poll.Id);
@@ -24,7 +24,7 @@ namespace Client.Commands
 				? pollRoles.GetRange(0, 20)
 				: pollRoles;
 
-			ComponentBuilder cb = new ComponentBuilder();
+			ComponentBuilder cb = new();
 			SelectMenuBuilder sb = new SelectMenuBuilder()
 				.WithCustomId($"poll.{id}.result")
 				.WithPlaceholder("select your roles")
