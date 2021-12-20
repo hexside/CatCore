@@ -33,6 +33,10 @@ namespace Client.Commands
 							new DBReader<User>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						SqlResultType.Pronoun => JsonSerializer.Serialize<List<DBManager.Pronoun>>(
 							new DBReader<DBManager.Pronoun>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
+						SqlResultType.Poll => JsonSerializer.Serialize<List<Poll>>(
+							new DBReader<Poll>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
+						SqlResultType.PollRole => JsonSerializer.Serialize<List<PollRole>>(
+							new DBReader<PollRole>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						// when that fails fallback on the legacy behavior
 						_ => (await DBHelper.RunQueryAsync(command)).ReadAsText(2000)
 					};
@@ -46,6 +50,8 @@ namespace Client.Commands
 			{
 				User,
 				Pronoun,
+				Poll,
+				PollRole,
 				Invalid
 			}
 		}

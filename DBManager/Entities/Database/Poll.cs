@@ -24,6 +24,12 @@ namespace DBManager
 
 		[SqlColumn("footer")]
 		public string? Footer { get; set; }
+		
+		[SqlColumn("min")]
+		public int? Min { get; set; }
+		
+		[SqlColumn("max")]
+		public int? Max { get; set; }
 
 		public EmbedBuilder GetEmbed()
 			=> new EmbedBuilder()

@@ -20,8 +20,9 @@ namespace Client.Commands
 		[Summary("role", "the role to add")]
 		IRole role,
 		[Summary("description", "the text shown under the role name")]
-		string description = "")
+		string description = null)
 		{
+			description ??= role.Name;
 			ulong pollId = Convert.ToUInt64(pollName);
 
 			Poll poll = await DBHelper.GetPollAsync(pollId);

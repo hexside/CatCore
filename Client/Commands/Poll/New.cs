@@ -11,14 +11,26 @@ namespace Client.Commands
 	public partial class PollCommands
 	{
 		[SlashCommand("new", "add a new poll")]
-		public async Task New(string name, string? description = null, string? footer = null)
+		public async Task New(
+			[Summary(null, "The name of the poll.")]
+			string name,
+			[Summary(null, "polls description.")]
+			string? description = null,
+			[Summary(null, "polls embed footer.")]
+			string? footer = null,
+			[Summary(null, "The smallest number of options a user can choose (defaults to total options if too small).")]
+			int min = 0,
+			[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
+			int max = 0)
 		{
 			Poll poll = new()
 			{
 				Title = name,
 				Description = description ?? "",
 				Footer = footer ?? "",
-				GuildId = Context.Guild.Id
+				GuildId = Context.Guild.Id,
+				Max = max,
+				Min = min
 			};
 
 			await DBHelper.AddPollAsync(poll);

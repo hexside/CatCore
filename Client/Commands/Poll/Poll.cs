@@ -13,7 +13,7 @@ using Discord.Net;
 namespace Client.Commands
 {
 	public partial class PollCommands
-	{ 
+	{
 		[ComponentInteraction("poll.*.launch", true)]
 		public async Task RespondWithPoll(string id)
 		{
@@ -24,11 +24,20 @@ namespace Client.Commands
 				? pollRoles.GetRange(0, 20)
 				: pollRoles;
 
+			int min = (poll.Min ?? 0) > pollRoles.Count || poll.Min < 0 
+				? pollRoles.Count 
+				: poll.Min ?? 0;
+				
+			int max = (poll.Max ?? 0) > pollRoles.Count || poll.Max < 1
+				? pollRoles.Count
+				: poll.Max ?? pollRoles.Count;
+
 			ComponentBuilder cb = new();
 			SelectMenuBuilder sb = new SelectMenuBuilder()
 				.WithCustomId($"poll.{id}.result")
 				.WithPlaceholder("select your roles")
-				.WithMinValues(0);
+				.WithMinValues(min)
+				.WithMaxValues(max);
 
 			List<SocketRole> roles = Context.Guild.Roles.ToList();
 
@@ -40,9 +49,9 @@ namespace Client.Commands
 			pollRoles = pollRoles.Count > 20
 				? pollRoles.GetRange(0, 20)
 				: pollRoles;
-			cb.WithSelectMenu(sb.WithMaxValues(sb.Options.Count));
+			cb.WithSelectMenu(sb);
 
-			await RespondAsync(embed: poll.GetEmbed().Build(), component: cb.Build(), ephemeral:true);
+			await RespondAsync(embed: poll.GetEmbed().Build(), component: cb.Build(), ephemeral: true);
 		}
 	}
 }
