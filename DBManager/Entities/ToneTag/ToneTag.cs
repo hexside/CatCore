@@ -27,11 +27,10 @@ namespace DBManager
 			}
 		}
 
-#nullable enable
 		public ListMatchesResult Matches(string value)
 		{
 			bool matches = false;
-			string? matchesValue = null;
+			string matchesValue = null;
 
 			_allValues.OnEach(x =>
 			{
@@ -44,6 +43,5 @@ namespace DBManager
 
 			return new (matches, matchesValue);
 		}
-#nullable disable
 	}
 }
