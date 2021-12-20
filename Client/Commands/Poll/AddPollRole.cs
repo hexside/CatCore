@@ -22,7 +22,6 @@ public partial class PollCommands
 		SocketGuildUser user = Context.User as SocketGuildUser;
 		List<ulong> selectedRoles = values.Select(x => Convert.ToUInt64(x)).ToList();
 
-
 		List<ulong> addRoles = selectedRoles
 			.Where(x => !user.Roles
 				.Select(x => x.Id)

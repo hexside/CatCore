@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace DBManager;
 
 /// <summary>
-/// A helper class used to convert sql statments to managed objects
+/// A helper class used to convert sql statements to managed objects
 /// </summary>
 /// <typeparam name="T">The type of object this class will convert</typeparam>
 public class DBReader<T>
@@ -22,12 +22,10 @@ public class DBReader<T>
 	private readonly DBHelper _helper;
 
 	/// <summary>
-	///		Initilises the Query
+	///		Initializes the Query
 	/// </summary>
 	/// <remarks>
-	///		When running with the queryType of <see cref="ReadAction.Table"/>
-	///		you can specify <see cref="MySqlParameter"/>s via <paramref name="options"/>
-	///		each option should have a <see cref="MySqlParameter.ParameterName"/>
+	/// <param name="helper">the DBHelper to interact with the 
 	///		that matches the column you want to compare against
 	/// </remarks>
 	/// <param name="helper">the DBHelper to interact with the databse with</param>
@@ -47,7 +45,7 @@ public class DBReader<T>
 
 		if (queryType == ReadAction.Table && options.Length >= 1)
 		{
-			_sql += " where " + 
+			_sql += " where " +
 				string.Concat(options.Select(x => $"{x.ParameterName.Cp()}=" +
 				$"@{x.ParameterName.Cp()} and "))[..^4] + ";";
 		}
@@ -66,21 +64,20 @@ public class DBReader<T>
 		.GetProperties()
 		.Where(x => x.CanWrite)
 		.Where(x => x.GetCustomAttribute<SqlColumnAttribute>() != null)
-		.ToDictionary(x => x.GetCustomAttribute<SqlColumnAttribute>().Name.ToLower(),x => x);
+		.ToDictionary(x => x.GetCustomAttribute<SqlColumnAttribute>().Name.ToLower(), x => x);
 
 	/// <summary>
 	///		Run the query.
 	/// </summary>
 	/// <param name="tBase">
 	/// The default object to use; set to <see langword="new"/>(<see cref="T"/>)
-	/// for a blank implemetation
+	/// for a blank implementation
 	/// </param>
 	/// <returns>A <see cref="List"/> of the items returned by the query.</returns>
 	public async Task<List<T>> RunAsync(T tBase)
 	{
-		MySqlDataReader reader = await _helper.RunQueryAsync(_sql, _parameters);
+		using MySqlDataReader reader = await _helper.RunQueryAsync(_sql, _parameters);
 		List<T> result = ParseReader(reader, tBase);
-		reader.Dispose();
 		return result;
 	}
 

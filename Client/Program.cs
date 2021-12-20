@@ -1,14 +1,15 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
-using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 using Utils;
 using DBManager;
+using System.Text.Json;
 
 namespace Client;
 
@@ -33,6 +34,7 @@ internal class Program
 		.AddSingleton<CommandHandler>(x => new(x.GetRequiredService<DiscordSocketClient>(),
 			x.GetRequiredService<InteractionService>(), x))
 		.AddSingleton(new DBHelper(_settings.DBConnectionString))
+		.AddSingleton(JsonSerializer.Deserialize<List<ToneTag>>(File.ReadAllText("tags.json")))
 		.BuildServiceProvider();
 
 	private static async Task Main(string[] _)

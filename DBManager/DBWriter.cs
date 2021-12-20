@@ -9,8 +9,8 @@ using MySql.Data.MySqlClient;
 namespace DBManager;
 
 /// <summary>
-///		A helper class used convert to manged objects to sql statments, 
-///		and them to the databse
+///		A helper class used convert to manged objects to sql statements, 
+///		and add them to the database
 /// </summary>
 /// <typeparam name="T">The type of object this class will convert</typeparam>
 public class DBWriter<T>
