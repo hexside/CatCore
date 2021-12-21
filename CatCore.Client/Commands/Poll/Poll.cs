@@ -25,12 +25,12 @@ namespace CatCore.ClientCommands
 				: pollRoles;
 
 			int min = poll.Min > pollRoles.Count || poll.Min < 0 
-				? pollRoles.Count 
-				: poll.Min;
+				? 1
+				: poll.Min ?? 1;
 				
 			int max = poll.Max > pollRoles.Count || poll.Max < 1
 				? pollRoles.Count
-				: poll.Max;
+				: poll.Max ?? pollRoles.Count;
 
 			ComponentBuilder cb = new();
 			SelectMenuBuilder sb = new SelectMenuBuilder()

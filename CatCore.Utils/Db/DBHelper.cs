@@ -30,7 +30,7 @@ namespace CatCore.Data
 		/// Stores cached versions of embedded sql queries
 		/// </summary>
 		public Dictionary<string, string> Sql { get; private set; }
-		
+
 		public event Func<LogMessage, Task> Log;
 
 		public DBHelper(string connectionString)
@@ -256,7 +256,7 @@ namespace CatCore.Data
 		/// <param name="poll">the poll to add</param>
 		public async Task AddPollAsync(Poll poll)
 			=> await new DBWriter<Poll>(this, "polls", poll, WriteAction.Add).RunAsync();
-		
+
 		/// <summary>
 		/// Adds a role to a poll
 		/// </summary>
@@ -270,12 +270,22 @@ namespace CatCore.Data
 		/// <param name="poll">the poll to remove</param>
 		public async Task RemovePollAsync(Poll poll)
 			=> await new DBWriter<Poll>(this, "polls", poll, WriteAction.Remove).RunAsync();
-		
+
 		/// <summary>
 		/// Removes a poll role from the db
 		/// </summary>
 		/// <param name="role">the role to remove</param>
 		public async Task RemovePollRoleAsync(PollRole role)
 			=> await new DBWriter<PollRole>(this, "pollroles", role, WriteAction.Remove).RunAsync();
+
+
+		/// <summary>
+		///	Updates a poll
+		/// </summary>
+		/// <param name="oldPoll">the poll to update</param>
+		/// <param name="newPoll">the new poll</param>
+
+		public async Task UpdatePollAsync(Poll oldPoll, Poll newPoll)
+			=> await new DBWriter<Poll>(this, "polls", oldPoll, WriteAction.Update, newPoll).RunAsync();
 	}
 }
