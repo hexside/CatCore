@@ -17,7 +17,6 @@ public partial class PollCommands
 	{
 		await (Context.Interaction as SocketMessageComponent).DeferLoadingAsync(ephemeral: true);
 		
-		
 		List<PollRole> roles = await DBHelper.GetPollRolesAsync(Convert.ToUInt64(id));
 		SocketGuildUser user = Context.User as SocketGuildUser;
 		List<ulong> selectedRoles = values.Select(x => Convert.ToUInt64(x)).ToList();

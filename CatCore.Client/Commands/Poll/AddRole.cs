@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord.Interactions;
 using CatCore.Client.Autocomplete;
 using Discord;
+using Discord.WebSocket;
 using CatCore.Data;
 
 namespace CatCore.Client.Commands
@@ -22,15 +23,29 @@ namespace CatCore.Client.Commands
 		[Summary("description", "the text shown under the role name")]
 		string description = null)
 		{
-			description ??= role.Name;
+			if (role.Position <= ((SocketGuildUser)Context.User).Roles.Select(x => x.Position).OrderByDescending(x => x).First() || 
+				!((SocketGuildUser)Context.User).GuildPermissions.ManageRoles)
+			{
+				await RespondAsync($"You don't have permission to manage this role. Make sure it is below your highest role, and you have the `Manage Roles` permission");
+				return;
+			}
+			
+			if (role.Position <= ((SocketGuildChannel)Context.Channel).Guild.CurrentUser.Roles.Select(x => x.Position).OrderByDescending(x => x).First() ||
+				!((SocketGuildChannel)Context.Channel).Guild.CurrentUser.GuildPermissions.ManageRoles)
+			{
+				await RespondAsync($"I don't have permission to manage this role. Make sure it is below my highest role, and I have the `Manage Roles` permission");
+				return;
+			}
 
 			List<PollRole> roles = await DBHelper.GetPollRolesAsync(poll.Id);
 
 			if (roles.Any(x => x.Id == role.Id))
 			{
-				await RespondAsync($"this poll already has {role.Mention}.", ephemeral:true);
+				await RespondAsync($"This poll already has {role.Mention}.", ephemeral:true, allowedMentions:AllowedMentions.None);
 				return;
 			}
+			
+			description ??= role.Name;
 
 			PollRole newRole = new()
 			{
@@ -41,7 +56,7 @@ namespace CatCore.Client.Commands
 
 			await DBHelper.AddPollRoleAsync(newRole);
 
-			await RespondAsync($"Added {role.Mention} to the poll.", ephemeral: true);
+			await RespondAsync($"Added {role.Mention} to the poll.", ephemeral: true, allowedMentions: AllowedMentions.None);
 		}
 	}
 }
