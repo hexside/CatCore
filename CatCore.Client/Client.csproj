@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DBManager\DBManager.csproj" />
+    <ProjectReference Include="..\CatCore.Utils\CatCore.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
