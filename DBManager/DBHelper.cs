@@ -277,5 +277,15 @@ namespace DBManager
 		/// <param name="role">the role to remove</param>
 		public async Task RemovePollRoleAsync(PollRole role)
 			=> await new DBWriter<PollRole>(this, "pollroles", role, WriteAction.Remove).RunAsync();
+
+
+		/// <summary>
+		///	Updates a poll
+		/// </summary>
+		/// <param name="oldPoll">the poll to update</param>
+		/// <param name="newPoll">the new poll</param>
+
+		public async Task UpdatePollAsync(Poll oldPoll, Poll newPoll)
+			=> await new DBWriter<Poll>(this, "polls", oldPoll, WriteAction.Update, newPoll).RunAsync();
 	}
 }

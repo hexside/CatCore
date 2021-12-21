@@ -3,5 +3,6 @@
 public enum WriteAction
 {
 	Add,
-	Remove
+	Remove,
+	Update,
 }
