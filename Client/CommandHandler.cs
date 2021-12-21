@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Utils;
+using Client.TypeConverters;
 
 namespace Client
 {
@@ -31,12 +32,21 @@ namespace Client
 
 		public async Task InitializeAsync()
 		{
-			await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+			try
+			{
+				_interactionService.AddTypeConverter(typeof(int?), new DefaultNullableValueConverter<int>());
+				await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
-			_client.InteractionCreated += _handleInteraction;
-			// TODO: post interaction cleanup and error logging.
+				_client.InteractionCreated += _handleInteraction;
+				
+				// TODO: post interaction cleanup and error logging.
 
-			_interactionService.SlashCommandExecuted += _slashCommandExecuted;
+				_interactionService.SlashCommandExecuted += _slashCommandExecuted;
+			}
+			catch (Exception ex)
+			{
+				await _logger.LogCritical("Failed to start interactions service.", ex);
+			}
 		}
 
 		private async Task _slashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)

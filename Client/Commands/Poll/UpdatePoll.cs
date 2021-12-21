@@ -1,0 +1,40 @@
+using System.Threading.Tasks;
+using Client.Autocomplete;
+using Discord.Interactions;
+using DBManager;
+using System;
+
+namespace Client.Commands;
+public partial class PollCommands
+{
+	[SlashCommand("update", "modify a already created poll")]
+	public async Task UpdatePoll(
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		[Summary("poll", "the poll to update.")]
+		string pollID,
+		[Summary(null, "The name of the poll.")]
+		string name = null,
+		[Summary(null, "polls description.")]
+		string? description = null,
+		[Summary(null, "polls embed footer.")]
+		string? footer = null,
+		[Summary(null, "The smallest number of options a user can choose (defaults to total options if too small).")]
+		int? min = null,
+		[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
+		int? max = null
+	)
+	{
+		Poll oldPoll = await DBHelper.GetPollAsync(Convert.ToUInt64(pollID));
+		Poll newPoll = new()
+		{
+			Description = description ?? oldPoll.Description,
+			Footer = footer ?? oldPoll.Footer,
+			Id = oldPoll.Id,
+			Max = max ?? oldPoll.Max,
+			Min = min ?? oldPoll.Min,
+			Title = name ?? oldPoll.Title
+		};
+		await DBHelper.UpdatePollAsync(oldPoll, newPoll);
+		await RespondAsync("Updated the poll", new[] { newPoll.GetEmbed().Build() }, ephemeral: true);
+	}
+}

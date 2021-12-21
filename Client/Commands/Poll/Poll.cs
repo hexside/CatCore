@@ -24,13 +24,13 @@ namespace Client.Commands
 				? pollRoles.GetRange(0, 20)
 				: pollRoles;
 
-			int min = (poll.Min ?? 0) > pollRoles.Count || poll.Min < 0 
+			int min = poll.Min > pollRoles.Count || poll.Min < 0 
 				? pollRoles.Count 
-				: poll.Min ?? 0;
+				: poll.Min;
 				
-			int max = (poll.Max ?? 0) > pollRoles.Count || poll.Max < 1
+			int max = poll.Max > pollRoles.Count || poll.Max < 1
 				? pollRoles.Count
-				: poll.Max ?? pollRoles.Count;
+				: poll.Max;
 
 			ComponentBuilder cb = new();
 			SelectMenuBuilder sb = new SelectMenuBuilder()

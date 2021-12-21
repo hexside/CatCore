@@ -19,9 +19,9 @@ namespace Client.Commands
 			[Summary(null, "polls embed footer.")]
 			string? footer = null,
 			[Summary(null, "The smallest number of options a user can choose (defaults to total options if too small).")]
-			int min = 0,
+			int? min = 0,
 			[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
-			int max = 0)
+			int? max = 0)
 		{
 			Poll poll = new()
 			{
@@ -29,8 +29,8 @@ namespace Client.Commands
 				Description = description ?? "",
 				Footer = footer ?? "",
 				GuildId = Context.Guild.Id,
-				Max = max,
-				Min = min
+				Max = max.Value,
+				Min = min.Value
 			};
 
 			await DBHelper.AddPollAsync(poll);

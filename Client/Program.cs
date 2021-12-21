@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Net;
 using Discord.Interactions;
 using Discord.WebSocket;
 using System.Collections.Generic;
@@ -64,9 +65,15 @@ internal class Program
 			{
 				_firstReady = false;
 				await _logger.LogVerbose("starting interaction service").ConfigureAwait(false);
-
-				if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
-				else await commands.RegisterCommandsGloballyAsync(true);
+				try
+				{
+					if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
+					else await commands.RegisterCommandsGloballyAsync(true);
+				}
+				catch (HttpException ex)
+				{
+					await _logger.LogCritical($"Failed to regester commands because {ex}").ConfigureAwait(false);
+				}
 			}
 		};
 
