@@ -7,7 +7,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/Client/Client.csproj",
+				"${workspaceFolder}/CatCore.Client/CatCore.Client.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
@@ -19,7 +19,7 @@
 			"type": "process",
 			"args": [
 				"publish",
-				"${workspaceFolder}/Client/Client.csproj",
+				"${workspaceFolder}/CatCore.Client/CatCore.Client.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
@@ -32,7 +32,7 @@
 			"args": [
 				"watch",
 				"run",
-				"${workspaceFolder}/Client/Client.csproj",
+				"${workspaceFolder}/CatCore.Client/CatCore.Client.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
