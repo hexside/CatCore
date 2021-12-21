@@ -4,7 +4,7 @@ using Discord;
 using System;
 using System.Threading.Tasks;
 
-namespace CatCore.ClientTypeConverters
+namespace CatCore.Client.TypeConverters
 {
 	// TODO: Replace with lib intigrated when functional.
 	public class DefaultNullableValueConverter<T> : TypeConverter
@@ -39,7 +39,6 @@ namespace CatCore.ClientTypeConverters
 
 		public sealed override bool CanConvertTo(Type t)
 		{
-			Console.WriteLine("test");
 			if (t == typeof(short?) || t == typeof(int?) || t == typeof(long?) ||
 				t == typeof(ushort?) || t == typeof(uint?) || t == typeof(ulong?)) return true;
 			else

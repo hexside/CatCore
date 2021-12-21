@@ -10,7 +10,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Discord.Net;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class PollCommands
 	{

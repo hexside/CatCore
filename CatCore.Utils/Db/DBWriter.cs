@@ -19,7 +19,7 @@ public class DBWriter<T>
 
 	private readonly DBHelper _helper;
 	private readonly string _sql;
-	private List<MySqlParameter> _parameters;
+	private readonly List<MySqlParameter> _parameters;
 	private readonly List<MySqlParameter> _nParameters;
 	private readonly T _obj;
 	private readonly T _nObj;

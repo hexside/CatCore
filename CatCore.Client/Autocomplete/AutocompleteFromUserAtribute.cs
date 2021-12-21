@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CatCore.ClientAutocomplete
+namespace CatCore.Client.Autocomplete
 {
 	/// <summary>
 	/// This attribute makes supported autocomplete providers

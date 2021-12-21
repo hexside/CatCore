@@ -8,7 +8,7 @@ using Discord;
 using Discord.WebSocket;
 using CatCore.Data;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	[Group("dev", "developer tools, for cool cats only.")]
 	public partial class Dev : InteractionModuleBase<SocketInteractionContext>

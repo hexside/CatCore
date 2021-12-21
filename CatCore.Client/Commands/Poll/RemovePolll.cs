@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using CatCore.Data;
-using CatCore.ClientAutocomplete;
+using CatCore.Client.Autocomplete;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class PollCommands
 	{
@@ -15,10 +15,8 @@ namespace CatCore.ClientCommands
 		public async Task Delete(
 			[Summary("poll", "The poll to delete.")]
 			[Autocomplete(typeof(PollAutocompleteProvider))]
-			string pollId)
-		{
-			Poll poll = await DBHelper.GetPollAsync(Convert.ToUInt64(pollId));
-			
+			Poll poll)
+		{	
 			await DBHelper.RemovePollAsync(poll);
 
 			await RespondAsync("Removed the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);

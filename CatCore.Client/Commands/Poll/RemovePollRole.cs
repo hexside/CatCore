@@ -5,22 +5,21 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using CatCore.Data;
-using CatCore.ClientAutocomplete;
+using CatCore.Client.Autocomplete;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class PollCommands
 	{
 		[SlashCommand("remove-role", "deletes a role from a poll")]
 		public async Task DeleteRole(
-			[Summary("poll", "The poll to delete the roll from.")]
+			[Summary(null, "The poll to delete the roll from.")]
 			[Autocomplete(typeof(PollAutocompleteProvider))]
-			string pollId,
+			Poll poll,
 			[Summary(null, "The role to remove.")]
 			SocketRole discordRole
 			)
 		{
-			Poll poll = await DBHelper.GetPollAsync(Convert.ToUInt64(pollId));
 			List<PollRole> roles = await DBHelper.GetPollRolesAsync(poll.Id);
 			PollRole role = roles.Where(x => x.RoleId == discordRole.Id).FirstOrDefault();
 			if (role is null)

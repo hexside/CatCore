@@ -8,7 +8,7 @@ using System.Text.Json;
 using Discord;
 using CatCore.Data;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class Dev
 	{

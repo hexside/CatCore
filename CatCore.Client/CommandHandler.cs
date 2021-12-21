@@ -8,7 +8,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CatCore.Utils;
-using CatCore.ClientTypeConverters;
+using CatCore.Client.TypeConverters;
+using CatCore.Data;
 
 namespace Client
 {
@@ -34,7 +35,9 @@ namespace Client
 		{
 			try
 			{
+				await _logger.LogVerbose("Adding TypeConverters").ConfigureAwait(false);
 				_interactionService.AddTypeConverter(typeof(int?), new DefaultNullableValueConverter<int>());
+				_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
 				await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
 				_client.InteractionCreated += _handleInteraction;

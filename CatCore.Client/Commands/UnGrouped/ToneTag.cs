@@ -6,7 +6,7 @@ using System.Linq;
 using CatCore.Data;
 using Discord;
 
-namespace CatCore.ClientCommands;
+namespace CatCore.Client.Commands;
 public partial class UnGrouped
 {
 	public List<ToneTag> Tags { get; set; }

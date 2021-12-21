@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using CatCore.Data;
-using CatCore.ClientAutocomplete;
+using CatCore.Client.Autocomplete;
 using Discord.WebSocket;
 using Discord;
 
-namespace CatCore.ClientCommands;
+namespace CatCore.Client.Commands;
 
 public partial class PronounCommands
 {

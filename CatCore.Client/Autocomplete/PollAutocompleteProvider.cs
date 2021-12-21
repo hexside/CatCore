@@ -7,7 +7,7 @@ using Discord;
 using Discord.Interactions;
 using CatCore.Data;
 
-namespace CatCore.ClientAutocomplete;
+namespace CatCore.Client.Autocomplete;
 internal class PollAutocompleteProvider : AutocompleteHandler
 {
 	public DBHelper DBHelper { get; set; }

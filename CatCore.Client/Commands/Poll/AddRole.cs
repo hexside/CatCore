@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
-using CatCore.ClientAutocomplete;
+using CatCore.Client.Autocomplete;
 using Discord;
 using CatCore.Data;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class PollCommands
 	{
@@ -16,18 +16,15 @@ namespace CatCore.ClientCommands
 		public async Task Add(
 		[Summary("poll", "the poll to add the role to")]
 		[Autocomplete(typeof(PollAutocompleteProvider))]
-		string pollName,
+		Poll poll,
 		[Summary("role", "the role to add")]
 		IRole role,
 		[Summary("description", "the text shown under the role name")]
 		string description = null)
 		{
 			description ??= role.Name;
-			ulong pollId = Convert.ToUInt64(pollName);
 
-			Poll poll = await DBHelper.GetPollAsync(pollId);
-
-			List<PollRole> roles = await DBHelper.GetPollRolesAsync(pollId);
+			List<PollRole> roles = await DBHelper.GetPollRolesAsync(poll.Id);
 
 			if (roles.Any(x => x.Id == role.Id))
 			{
@@ -38,7 +35,7 @@ namespace CatCore.ClientCommands
 			PollRole newRole = new()
 			{
 				Description = description,
-				PollId = pollId,
+				PollId = poll.Id,
 				RoleId = role.Id
 			};
 

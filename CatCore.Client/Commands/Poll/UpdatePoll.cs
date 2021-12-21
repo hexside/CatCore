@@ -1,17 +1,17 @@
 using System.Threading.Tasks;
-using CatCore.ClientAutocomplete;
+using CatCore.Client.Autocomplete;
 using Discord.Interactions;
 using CatCore.Data;
 using System;
 
-namespace CatCore.ClientCommands;
+namespace CatCore.Client.Commands;
 public partial class PollCommands
 {
 	[SlashCommand("update", "modify a already created poll")]
 	public async Task UpdatePoll(
 		[Autocomplete(typeof(PollAutocompleteProvider))]
 		[Summary("poll", "the poll to update.")]
-		string pollID,
+		Poll oldPoll,
 		[Summary(null, "The name of the poll.")]
 		string name = null,
 		[Summary(null, "polls description.")]
@@ -24,8 +24,6 @@ public partial class PollCommands
 		int max = -1
 	)
 	{
-		Console.WriteLine("test");
-		Poll oldPoll = await DBHelper.GetPollAsync(Convert.ToUInt64(pollID));
 		Poll newPoll = new()
 		{
 			Description = description ?? oldPoll.Description,

@@ -6,19 +6,18 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
-using CatCore.ClientAutocomplete;
+using CatCore.Client.Autocomplete;
 using CatCore.Data;
 
-namespace CatCore.ClientCommands;
+namespace CatCore.Client.Commands;
 public partial class PollCommands
 {
 	[SlashCommand("send", "sends a poll")]
 	public async Task SendPoll(
 	[Autocomplete(typeof(PollAutocompleteProvider))]
 	[Summary("poll", "the poll to send")]
-	string pollIdString)
+	Poll poll)
 	{
-		Poll poll = await DBHelper.GetPollAsync(Convert.ToUInt64(pollIdString));
 		await RespondAsync(embed:poll.GetEmbed().Build(), component: new ComponentBuilder()
 			.WithButton("launch poll", $"poll.{poll.Id}.launch", ButtonStyle.Primary).Build());
 	}

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class Dev
 	{

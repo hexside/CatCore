@@ -7,7 +7,7 @@ using Discord.Interactions;
 using Discord;
 using CatCore.Data;
 
-namespace CatCore.ClientCommands
+namespace CatCore.Client.Commands
 {
 	public partial class Dev
 	{
