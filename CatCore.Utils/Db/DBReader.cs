@@ -7,7 +7,7 @@ using System.Reflection;
 using MySql.Data.MySqlClient;
 using System.Text.Json;
 
-namespace DBManager;
+namespace CatCore.Data;
 
 /// <summary>
 /// A helper class used to convert sql statements to managed objects

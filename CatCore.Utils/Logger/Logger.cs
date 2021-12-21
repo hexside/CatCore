@@ -5,7 +5,7 @@ using Discord;
 using Discord.Webhook;
 using System.Linq;
 
-namespace Utils;
+namespace CatCore.Utils;
 public class Logger : IDisposable
 {
 	public List<LogMessage> Messages { get; private set; }

@@ -7,7 +7,7 @@ using Discord.Interactions;
 using Discord;
 using Discord.WebSocket;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class Dev
 	{

@@ -7,7 +7,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext>
 {
 	private static readonly List<AutocompleteResult> _activities = new()

@@ -5,9 +5,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
-using DBManager;
+using CatCore.Data;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class Dev
 	{

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 
-namespace DBManager
+namespace CatCore.Data
 {
 	public class PollRole
 	{

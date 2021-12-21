@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBManager
+namespace CatCore.Data
 {
 	public struct ListMatchesResult
 	{

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Discord.Interactions;
 using System.Text.Json;
 using Discord;
-using DBManager;
+using CatCore.Data;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class Dev
 	{
@@ -31,8 +31,8 @@ namespace Client.Commands
 						// use a fancy json conversion if possible
 						SqlResultType.User => JsonSerializer.Serialize<List<User>>(
 							new DBReader<User>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
-						SqlResultType.Pronoun => JsonSerializer.Serialize<List<DBManager.Pronoun>>(
-							new DBReader<DBManager.Pronoun>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
+						SqlResultType.Pronoun => JsonSerializer.Serialize<List<CatCore.Data.Pronoun>>(
+							new DBReader<CatCore.Data.Pronoun>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						SqlResultType.Poll => JsonSerializer.Serialize<List<Poll>>(
 							new DBReader<Poll>(DBHelper, command, ReadAction.RawSql).Run(new()), _jsonOptions),
 						SqlResultType.PollRole => JsonSerializer.Serialize<List<PollRole>>(

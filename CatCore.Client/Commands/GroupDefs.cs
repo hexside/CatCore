@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
 using Discord.WebSocket;
-using DBManager;
+using CatCore.Data;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	[Group("dev", "developer tools, for cool cats only.")]
 	public partial class Dev : InteractionModuleBase<SocketInteractionContext>

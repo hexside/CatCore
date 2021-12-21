@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 using Ubiety.Dns.Core;
 using System.Text.Json;
 
-namespace DBManager
+namespace CatCore.Data
 {
 	public static class DBExtentions
 	{

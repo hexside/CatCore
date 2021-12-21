@@ -8,8 +8,8 @@ using System;
 using System.Reflection;
 using System.IO;
 using System.Threading.Tasks;
-using Utils;
-using DBManager;
+using CatCore.Utils;
+using CatCore.Data;
 using System.Text.Json;
 
 namespace Client;

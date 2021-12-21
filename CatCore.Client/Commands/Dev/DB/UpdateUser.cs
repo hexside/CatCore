@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Discord;
-using DBManager;
+using CatCore.Data;
 using Discord.Interactions;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 
 public partial class Dev
 {

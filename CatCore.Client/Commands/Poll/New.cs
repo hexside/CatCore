@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
-using DBManager;
+using CatCore.Data;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class PollCommands
 	{

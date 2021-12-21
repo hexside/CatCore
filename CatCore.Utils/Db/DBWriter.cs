@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using MySql.Data.MySqlClient;
 
-namespace DBManager;
+namespace CatCore.Data;
 
 /// <summary>
 ///		A helper class used convert to manged objects to sql statements, 

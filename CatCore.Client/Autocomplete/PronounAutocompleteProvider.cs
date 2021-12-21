@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
-using DBManager;
+using CatCore.Data;
 
-namespace Client.Autocomplete;
+namespace CatCore.ClientAutocomplete;
 internal class PronounAutocompleteProvider : AutocompleteHandler
 {
 	public DBHelper DBHelper { get; set; }

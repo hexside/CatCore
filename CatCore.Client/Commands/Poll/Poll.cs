@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DBManager;
+using CatCore.Data;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Discord.Net;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class PollCommands
 	{

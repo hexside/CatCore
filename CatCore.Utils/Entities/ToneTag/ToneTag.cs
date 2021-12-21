@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DBManager
+namespace CatCore.Data
 {
 
 	public class ToneTag

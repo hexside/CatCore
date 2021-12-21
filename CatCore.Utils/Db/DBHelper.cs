@@ -4,12 +4,12 @@ using MySql;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Net;
-using Utils;
+using CatCore.Utils;
 using System.Reflection;
 using System.IO;
 using Discord;
 
-namespace DBManager
+namespace CatCore.Data
 {
 	/// <summary>
 	/// A abstraction layer for <see cref="DBReader{T}"/> and <see cref="DBWriter{T}"/>

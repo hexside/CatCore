@@ -4,10 +4,10 @@ using System.Linq;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Discord.Interactions;
-using DBManager;
-using Client.Autocomplete;
+using CatCore.Data;
+using CatCore.ClientAutocomplete;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class PollCommands
 	{

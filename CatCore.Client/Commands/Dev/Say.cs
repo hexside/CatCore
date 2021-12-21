@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 public partial class Dev
 {
 	[SlashCommand("say", "echo a message")]

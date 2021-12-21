@@ -7,8 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Utils;
-using Client.TypeConverters;
+using CatCore.Utils;
+using CatCore.ClientTypeConverters;
 
 namespace Client
 {

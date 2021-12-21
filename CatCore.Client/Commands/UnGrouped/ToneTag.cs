@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
-using DBManager;
+using CatCore.Data;
 using Discord;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 public partial class UnGrouped
 {
 	public List<ToneTag> Tags { get; set; }

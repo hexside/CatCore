@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Discord.Interactions;
 using Discord;
 
-namespace Client.Commands
+namespace CatCore.ClientCommands
 {
 	public partial class Dev
 	{
 		[SlashCommand("ping", "check the current client latency")]
 		public async Task Ping()
-			=> await Context.Interaction.RespondAsync($"the current ping is {Context.Client.Latency}", ephemeral:true);
+			=> await Context.Interaction.RespondAsync($"the current ping is {Context.CatCore.ClientLatency}", ephemeral:true);
 	}
 }

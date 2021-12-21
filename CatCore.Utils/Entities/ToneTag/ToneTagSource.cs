@@ -1,4 +1,4 @@
-﻿namespace DBManager
+﻿namespace CatCore.Data
 {
 	public class ToneTagSource
 	{

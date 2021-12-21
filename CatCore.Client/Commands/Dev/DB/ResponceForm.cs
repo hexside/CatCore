@@ -1,4 +1,4 @@
-﻿namespace Client.Commands
+﻿namespace CatCore.ClientCommands
 {
 	public partial class Dev
 	{

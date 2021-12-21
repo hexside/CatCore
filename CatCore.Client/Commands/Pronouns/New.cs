@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using DBManager;
+using CatCore.Data;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 
 public partial class PronounCommands
 {

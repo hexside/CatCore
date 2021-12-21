@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Interactions;
-using DBManager;
-using Client.Autocomplete;
+using CatCore.Data;
+using CatCore.ClientAutocomplete;
 using Discord.WebSocket;
 using Discord;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 
 public partial class PronounCommands
 {

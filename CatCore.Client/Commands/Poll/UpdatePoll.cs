@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using Client.Autocomplete;
+using CatCore.ClientAutocomplete;
 using Discord.Interactions;
-using DBManager;
+using CatCore.Data;
 using System;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 public partial class PollCommands
 {
 	[SlashCommand("update", "modify a already created poll")]

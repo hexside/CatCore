@@ -4,7 +4,7 @@ using Discord;
 using System;
 using System.Threading.Tasks;
 
-namespace Client.TypeConverters
+namespace CatCore.ClientTypeConverters
 {
 	// TODO: Replace with lib intigrated when functional.
 	public class DefaultNullableValueConverter<T> : TypeConverter

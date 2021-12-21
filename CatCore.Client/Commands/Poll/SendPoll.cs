@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Interactions;
-using Client.Autocomplete;
-using DBManager;
+using CatCore.ClientAutocomplete;
+using CatCore.Data;
 
-namespace Client.Commands;
+namespace CatCore.ClientCommands;
 public partial class PollCommands
 {
 	[SlashCommand("send", "sends a poll")]
