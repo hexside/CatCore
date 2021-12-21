@@ -19,19 +19,20 @@ public partial class PollCommands
 		[Summary(null, "polls embed footer.")]
 		string? footer = null,
 		[Summary(null, "The smallest number of options a user can choose (defaults to total options if too small).")]
-		int? min = null,
+		int min = -1,
 		[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
-		int? max = null
+		int max = -1
 	)
 	{
+		Console.WriteLine("test");
 		Poll oldPoll = await DBHelper.GetPollAsync(Convert.ToUInt64(pollID));
 		Poll newPoll = new()
 		{
 			Description = description ?? oldPoll.Description,
 			Footer = footer ?? oldPoll.Footer,
 			Id = oldPoll.Id,
-			Max = max ?? oldPoll.Max,
-			Min = min ?? oldPoll.Min,
+			Max = max < 0 ? oldPoll.Max : max,
+			Min = min < 0 ? oldPoll.Min : min,
 			Title = name ?? oldPoll.Title
 		};
 		await DBHelper.UpdatePollAsync(oldPoll, newPoll);

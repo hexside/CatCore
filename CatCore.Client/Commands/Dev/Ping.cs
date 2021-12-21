@@ -12,6 +12,6 @@ namespace CatCore.ClientCommands
 	{
 		[SlashCommand("ping", "check the current client latency")]
 		public async Task Ping()
-			=> await Context.Interaction.RespondAsync($"the current ping is {Context.Client.ClientLatency}", ephemeral:true);
+			=> await Context.Interaction.RespondAsync($"the current ping is {Context.Client.Latency}", ephemeral:true);
 	}
 }
