@@ -50,7 +50,7 @@ public class DBWriter<T>
 		_nParameters = _readNParameters();
 		_sql = _readSql();
 	}
-
+	
 	private static Dictionary<PropertyInfo, string> _readMap(bool blockReadOnly) => typeof(T)
 		.GetProperties()
 		.Where(x => x.CanWrite)

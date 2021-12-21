@@ -18,7 +18,7 @@ namespace CatCore.Client.Commands
 			string? description = null,
 			[Summary(null, "polls embed footer.")]
 			string? footer = null,
-			[Summary(null, "The smallest number of options a user can choose (defaults to total options if too small).")]
+			[Summary(null, "The smallest number of options a user can choose (defaults to 1 if too small).")]
 			int? min = 0,
 			[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
 			int? max = 0)

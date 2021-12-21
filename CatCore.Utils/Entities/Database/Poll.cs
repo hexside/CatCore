@@ -26,10 +26,10 @@ namespace CatCore.Data
 		public string? Footer { get; set; }
 		
 		[SqlColumn("min")]
-		public int? Min { get; set; }
+		public int Min { get; set; }
 		
 		[SqlColumn("max")]
-		public int? Max { get; set; }
+		public int Max { get; set; }
 
 		public EmbedBuilder GetEmbed()
 			=> new EmbedBuilder()
