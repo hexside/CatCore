@@ -23,36 +23,42 @@ public partial class UnGrouped
 			.Select(x => x.Value[1..])
 			.ToList();
 
-		tags.OnEach(x => System.Console.WriteLine(x));
-
 		if (tags.Count < 1)
 		{
-			_ = await FollowupAsync("No tone tags were found in that message", ephemeral: true);
+			await RespondAsync("No tone tags were found in that message.", ephemeral: true);
 			return;
 		}
 
-		Dictionary<string, ToneTag> resolved = new();
-		tags.OnEach(x => resolved.Add(x, KnownTags.First(y => (y.Matches(x).Item2 ?? "") == x)));
-		List<ToneTagSource> credits = resolved.Values.Select(x => x.Source).RemoveDuplicates().ToList();
+		Dictionary<string, ToneTag?> resolved = new();
+		
+		// null values are unresolved tags.
+		tags.OnEach(x => resolved.Add(x, KnownTags.FirstOrDefault(y => (y.Matches(x).Item2 ?? "") == x)));
+		resolved.Where(x => x.Value is null).OnEach(x => resolved.Remove(x.Key));
+		List<ToneTagSource> credits = new();
+		
+		resolved.Values.Select(x => x.Source).OnEach(x => credits.Add(x));
+		credits = credits.RemoveDuplicates(x => x.Title).ToList();
 
 		if (resolved.Count >= 23)
 		{
-			await RespondAsync("too many tags", ephemeral: true);
+			await RespondAsync("The message has too many tags.", ephemeral: true);
 			return;
 		}
 
 		string missingTags = "";
 		string sources = "";
-		tags.OnEach(x => missingTags += $" `{x}`, ");
-		credits.OnEach(x => sources += x.Url is null
+		
+		tags.Where(x => !resolved.ContainsKey(x)).OnEach(x => missingTags += $" `{x}`, ");
+			
+		credits.Where(x => x is not null).OnEach(x => sources += x.Url is null
 			? $"{x.Title}, "
 			: $"[{x.Title}]({x.Url}), ");
 
 		EmbedBuilder eb = new EmbedBuilder()
 			.WithTitle("Tone Tags")
-			.WithDescription(tags.Count < 1
-				? "All tags in the message are known"
-				: $"unknown tags: {missingTags[..^2]}")
+			.WithDescription(missingTags == ""
+				? "All tags in the message are known."
+				: $"unknown tags: {missingTags[..^2]}.")
 			.AddField("Tag Sources", sources[..^2]);
 
 		resolved.OnEach(x => eb.AddField(x.Key, x.Value.Description));

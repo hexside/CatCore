@@ -31,5 +31,22 @@ namespace System.Linq
 			l.OnEach(x => { if (!r.Contains(x)) r.Add(x); });
 			return r;
 		}
+		
+		public static IEnumerable<Tin> RemoveDuplicates<Tin, Tret>(this IEnumerable<Tin> e, Func<Tin, Tret> c)
+		{
+			List<Tin> r = new();
+			List<Tret> v = new();
+			e.OnEach(x =>
+			{
+				Tret a = c(x);
+				if (!v.Contains(a))
+				{
+					v.Add(a);
+					r.Add(x);
+				}
+			});
+
+			return r;
+		}
 	}
 }
