@@ -1,6 +1,6 @@
+using System;
 using Discord.Interactions;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
 using CatCore.Data;
@@ -9,13 +9,32 @@ using System.Text.RegularExpressions;
 
 namespace CatCore.Client.Commands;
 
-public partial class UnGrouped
+public partial class ToneTagCommands
 {
-	public const string ToneTagRegex = ToneTagCommands.ToneTagRegex;
+	public const string ToneTagRegex = @"[\\\/]([^\\\/\s]+)";
 	public List<ToneTag> KnownTags { get; set; }
-	[MessageCommand("Tone Tag")]
-	public async Task ToneTag(SocketMessage message)
+	[SlashCommand("resolve", "Resolve the tone tags in a message.")]
+	public async Task Resolve
+	( 
+		[Summary("message-id", "The id of a message in this channel (see https://dis.gd/findmyid for info).")]
+		string messageId
+	)
 	{
+		if (!Regex.IsMatch(messageId, @"^\s*\d+\s*$"))
+		{
+			await RespondAsync("Invalid message id, make sure it is a number.", ephemeral:true);
+			return;
+		}
+		
+		IMessage message = await Context.Channel.GetMessageAsync(Convert.ToUInt64(messageId), 
+			options: new() {RetryMode = RetryMode.Retry502} );
+		
+		if (message is null)
+		{
+			await RespondAsync("A message with that id is not in the current channel.", ephemeral: true);
+			return;
+		}
+		
 		string content = message.Content ?? "empty-message";
 
 		List<string> tags = Regex.Matches(content, ToneTagRegex)
@@ -35,7 +54,7 @@ public partial class UnGrouped
 		resolved = tags.RemoveDuplicates().ToDictionary(x => x, x => KnownTags.FirstOrDefault(y => y.Matches(x)));
 		resolved.Where(x => x.Value is null).OnEach(x => resolved.Remove(x.Key));
 		List<ToneTagSource> credits = new();
-		
+
 		resolved.Values.Select(x => x.Source).OnEach(x => credits.Add(x));
 		credits = credits.RemoveDuplicates(x => x.Title).ToList();
 
@@ -47,9 +66,9 @@ public partial class UnGrouped
 
 		string missingTags = "";
 		string sources = "";
-		
+
 		tags.Where(x => !resolved.ContainsKey(x)).OnEach(x => missingTags += $" `{x}`, ");
-			
+
 		credits.Where(x => x is not null).OnEach(x => sources += x.Url is null
 			? $"{x.Title}, "
 			: $"[{x.Title}]({x.Url}), ");

@@ -14,9 +14,9 @@ namespace CatCore.Client.Commands
 		public async Task New(
 			[Summary(null, "The name of the poll.")]
 			string name,
-			[Summary(null, "polls description.")]
+			[Summary(null, "The poll's description.")]
 			string? description = null,
-			[Summary(null, "polls embed footer.")]
+			[Summary(null, "The poll's embed footer.")]
 			string? footer = null,
 			[Summary(null, "The smallest number of options a user can choose (defaults to 1 if too small).")]
 			int? min = 0,

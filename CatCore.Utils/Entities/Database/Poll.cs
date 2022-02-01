@@ -30,7 +30,6 @@ namespace CatCore.Data
 		
 		[SqlColumn("max")]
 		public int Max { get; set; }
-
 		public EmbedBuilder GetEmbed()
 			=> new EmbedBuilder()
 				.WithTitle(Title)

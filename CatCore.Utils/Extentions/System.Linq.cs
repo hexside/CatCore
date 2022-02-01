@@ -48,5 +48,14 @@ namespace System.Linq
 
 			return r;
 		}
+
+		public static IEnumerable<T> RangeOrDefault<T>(this IEnumerable<T> i, int s, int e)
+		{
+			if (i is null) return i;
+			var c = i.Count();
+			if (c < s) return i;
+			if (c < e) return i;
+			return i.Skip(s).Take(c - s - e);
+		}
 	}
 }

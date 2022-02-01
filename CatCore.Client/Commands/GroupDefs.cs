@@ -35,6 +35,8 @@ namespace CatCore.Client.Commands
 		public DBHelper DBHelper { get; set; }
 	}
 
+	[Group("tone-tag", "Commands for searching tone tags.")]
+	public partial class ToneTagCommands : InteractionModuleBase<SocketInteractionContext> {}
 	
 	public partial class UnGrouped : InteractionModuleBase<SocketInteractionContext> { }
 }

@@ -64,7 +64,7 @@ public class Logger : IDisposable
 			.WithCurrentTimestamp()
 			.WithColor(message.Severity.GetColor());
 		if (message.Exception != null)
-			builder.WithFooter(message.Exception?.ToString() ?? "[invalid exception]",
+			builder.WithFooter(string.Concat(message.Exception?.ToString().RangeOrDefault(0, 2048)) ?? "[invalid exception]",
 				"https://cdn.discordapp.com/emojis/842172192401915971.png?size=64");
 		
 		await _client.SendMessageAsync(embeds: new [] { builder.Build() });

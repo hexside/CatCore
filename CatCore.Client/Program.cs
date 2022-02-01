@@ -64,15 +64,19 @@ internal class Program
 			if (_firstReady)
 			{
 				_firstReady = false;
-				await _logger.LogVerbose("starting interaction service").ConfigureAwait(false);
+				await _logger.LogVerbose("Starting interaction service.").ConfigureAwait(false);
 				try
 				{
 					if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
 					else await commands.RegisterCommandsGloballyAsync(true);
+					
+					int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
+					await _logger.LogInfo($"Loaded {count} commands.");
+					await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
 				}
 				catch (HttpException ex)
 				{
-					await _logger.LogCritical($"Failed to regester commands because {ex}").ConfigureAwait(false);
+					await _logger.LogCritical($"Failed to regester commands because {ex}, (see {JsonSerializer.Serialize(ex.Errors)})").ConfigureAwait(false);
 				}
 			}
 		};

@@ -7,7 +7,6 @@ using CatCore.Data;
 
 namespace CatCore.Client.TypeConverters
 {
-	// TODO: Replace with lib intigrated when functional.
 	public class PollTypeConverter<T> : TypeConverter<T> where T : Poll
 	{
 		public DBHelper DBHelper { get; set; }

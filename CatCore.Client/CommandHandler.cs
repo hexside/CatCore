@@ -60,33 +60,23 @@ namespace Client
 			}
 			else
 			{
-				await _interactionFailHandle(command.Name, result, context.Interaction);
+				await _interactionFailHandle(command.Name, result, context.Interaction as SocketInteraction);
 			}
 		}
 
-		private async Task _interactionFailHandle(string name, IResult result, IDiscordInteraction discordInteraction)
+		private async Task _interactionFailHandle(string name, IResult result, SocketInteraction interaction)
 		{
 			string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"} error \n```\n{result?.ErrorReason}\n```";
-			// TODO: remove this once casting is not required
-			if (discordInteraction is not SocketInteraction sInteraction)
+			// interaction timed out.
+			if (!interaction.IsValidToken) return;
+			
+			if (interaction.HasResponded)
 			{
-				try
-				{
-					await discordInteraction.RespondAsync(error, ephemeral: true);
-				}
-				catch (Exception ex)
-				{
-					await _logger.LogError("failed to respond to a command", ex).ConfigureAwait(false);
-					await discordInteraction.FollowupAsync(error, ephemeral: true);
-				}
-			}
-			else if (!sInteraction.HasResponded)
-			{
-				await sInteraction.RespondAsync(error, ephemeral: true);
+				await interaction.RespondAsync(error, ephemeral: true);
 			}
 			else
 			{
-				await sInteraction.FollowupAsync(error, ephemeral: true);
+				await interaction.FollowupAsync(error, ephemeral: true);
 			}
 		}
 
