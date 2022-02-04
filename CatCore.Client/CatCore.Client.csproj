@@ -5,6 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
 	<Nullable>annotations</Nullable>
 	<Configurations>Debug;Release;Deploy</Configurations>
+  <ImplicitUsings>enable</ImplicitUsings>
 	<Platforms>AnyCPU;ARM32</Platforms>
 	<Version>0.0.1.1</Version>
     <Authors>CottageDwellingCat</Authors>
@@ -15,13 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CatCore.Utils\CatCore.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

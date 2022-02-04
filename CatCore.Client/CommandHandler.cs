@@ -36,7 +36,6 @@ namespace Client
 			try
 			{
 				await _logger.LogVerbose("Adding TypeConverters").ConfigureAwait(false);
-				_interactionService.AddTypeConverter(typeof(int?), new DefaultNullableValueConverter<int>());
 				_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
 				await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 

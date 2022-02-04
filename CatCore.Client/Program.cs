@@ -1,15 +1,13 @@
-﻿using Discord;
-using Discord.Net;
-using Discord.Interactions;
-using Discord.WebSocket;
-using System.Collections.Generic;
+﻿global using Discord;
+global using Discord.Net;
+global using Discord.Interactions;
+global using Discord.WebSocket;
+global using CatCore.Utils;
+global using CatCore.Data;
+global using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Reflection;
-using System.IO;
-using System.Threading.Tasks;
-using CatCore.Utils;
-using CatCore.Data;
 using System.Text.Json;
 
 namespace Client;
@@ -21,6 +19,7 @@ internal class Program
 	private static readonly ClientSettings _settings = new("clientSettings.json");
 
 	private static ServiceProvider _configureServices() => new ServiceCollection()
+		.AddDbContext<CatCoreContext>(ServiceLifetime.Transient)
 		.AddSingleton(new DiscordSocketClient(new() 
 		{ 
 			LogLevel = LogSeverity.Debug, 
@@ -34,7 +33,6 @@ internal class Program
 		}))
 		.AddSingleton<CommandHandler>(x => new(x.GetRequiredService<DiscordSocketClient>(),
 			x.GetRequiredService<InteractionService>(), x))
-		.AddSingleton(new DBHelper(_settings.DBConnectionString))
 		.AddSingleton(JsonSerializer.Deserialize<List<ToneTag>>(File.ReadAllText("tags.json")))
 		.BuildServiceProvider();
 
@@ -44,11 +42,9 @@ internal class Program
 		var client = services.GetRequiredService<DiscordSocketClient>();
 		var commands = services.GetRequiredService<InteractionService>();
 		var handler = services.GetRequiredService<CommandHandler>();
-		var db = services.GetRequiredService<DBHelper>();
 
 		client.Log += async (x) => await _logger.Log(x);
 		commands.Log += async (x) => await _logger.Log(x);
-		db.Log += async (x) => await _logger.Log(x);
 		handler.Log += async x => await _logger.Log(x);
 		
 
@@ -57,7 +53,6 @@ internal class Program
 		await _logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
 
 		await handler.InitializeAsync();
-		db.Init();
 
 		client.Ready += async () =>
 		{

@@ -1,0 +1,240 @@
+//TODO: make this file look clean
+
+using CatCore.Client.Autocomplete;
+
+namespace CatCore.Client.Commands;
+
+[Group("poll", "Commands for creating and managing polls.")]
+public partial class PollCommands : InteractionModuleBase<SocketInteractionContext>
+{
+	public CatCoreContext DB;
+
+	[SlashCommand("add-role", "adds a role to a poll")]
+	public async Task Add
+	(
+		[Summary("poll", "The poll to add the role to.")]
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		Poll poll,
+		[Summary("role", "The role to add.")]
+		IRole role,
+		[Summary("description", "the text shown under the role name")]
+		string description = null)
+	{
+		var guildUser = (SocketGuildUser)Context.User;
+		int userPosition = guildUser.Roles
+			.Select(x => x.Position)
+			.OrderByDescending(x => x)
+			.First();
+
+		int botPosition = Context.Guild.CurrentUser.Roles
+			.Select(x => x.Position)
+			.OrderByDescending(x => x)
+			.First();
+
+		bool hasPermission = Context.Guild.CurrentUser.GuildPermissions.ManageRoles;
+		bool userPermission = guildUser.GuildPermissions.ManageRoles;
+
+		if (role.Position <= userPosition || !hasPermission)
+		{
+			await RespondAsync($"You don't have permission to manage this role. Make sure it is below your highest" +
+				"role, and you have the `Manage Roles` permission");
+			return;
+		}
+
+		if (role.Position <= botPosition || !hasPermission)
+		{
+			await RespondAsync($"I don't have permission to manage this role. Make sure it is below my highest" +
+				"role, and I have the `Manage Roles` permission");
+			return;
+		}
+
+		var roles = DB.PollRoles.Where(x => x.PollId == poll.PollId);
+
+		if (roles.Any(x => x.RoleId == role.Id)) return;
+
+		description ??= role.Name;
+
+		PollRole newRole = new()
+		{
+			Description = description,
+			RoleId = role.Id,
+		};
+
+		poll.Roles.Add(newRole);
+		DB.Polls.Update(poll);
+		await DB.SaveChangesAsync();
+
+		await RespondAsync($"Added {role.Mention} to the poll.", ephemeral: true, allowedMentions: AllowedMentions.None);
+	}
+
+
+	[SlashCommand("new", "add a new poll")]
+	public async Task New(
+		[Summary(null, "The name of the poll.")]
+		string name,
+		[Summary(null, "The poll's description.")]
+		string? description = null,
+		[Summary(null, "The poll's embed footer.")]
+		string? footer = null,
+		[Summary(null, "The smallest number of options a user can choose (defaults to 1 if too small).")]
+		int? min = 0,
+		[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
+		int? max = 0)
+	{
+		Poll poll = new()
+		{
+			Title = name,
+			Description = description ?? "",
+			Footer = footer ?? "",
+			GuildId = Context.Guild.Id,
+			Max = max.Value,
+			Min = min.Value
+		};
+
+		await DB.Polls.AddAsync(poll);
+		await DB.SaveChangesAsync();
+
+		await RespondAsync("Added the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
+	}
+
+	[SlashCommand("delete", "deletes a new poll")]
+	public async Task Delete
+	(
+		[Summary("poll", "The poll to delete.")]
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		Poll poll)
+	{
+		DB.Polls.Remove(poll);
+		await DB.SaveChangesAsync();
+		await RespondAsync("Removed the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
+	}
+	
+	[SlashCommand("remove-role", "deletes a role from a poll")]
+	public async Task DeleteRole
+	(
+		[Summary(null, "The poll to delete the roll from.")]
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		Poll poll,
+		[Summary(null, "The role to remove.")]
+		SocketRole discordRole
+	)
+	{
+		PollRole role = poll.Roles.FirstOrDefault(x => x.RoleId == discordRole.Id);
+		if (role is null)
+		{
+			await RespondAsync("That role is not in the poll.", ephemeral: true);
+			return;
+		}
+		poll.Roles.Remove(role);
+		DB.Polls.Update(poll);
+		await DB.SaveChangesAsync();
+
+		await RespondAsync("Removed the role!", ephemeral: true);
+	}
+
+	[SlashCommand("send", "sends a poll")]
+	public async Task SendPoll
+	(
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		[Summary("poll", "the poll to send")]
+		Poll poll
+	) 
+		=> await RespondAsync(embed: poll.GetEmbed().Build(), component: new ComponentBuilder()
+			.WithButton("launch poll", $"poll.{poll.PollId}.launch", ButtonStyle.Primary).Build());
+
+	[SlashCommand("update", "modify a already created poll")]
+	public async Task UpdatePoll(
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		[Summary("poll", "the poll to update.")]
+		Poll poll,
+		[Summary(null, "The name of the poll.")]
+		string name = null,
+		[Summary(null, "polls description.")]
+		string? description = null,
+		[Summary(null, "polls embed footer.")]
+		string? footer = null,
+		[Summary(null, "The smallest number of options a user can choose (defaults to 1).")]
+		int? min = null,
+		[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")] 
+		int? max = null
+	)
+	{
+		poll.Title = name ?? poll.Title;
+		poll.Description = description ?? poll.Description;
+		poll.Footer = footer ?? poll.Footer;
+		poll.Min = min ?? poll.Min;
+		poll.Max = max ?? poll.Max;
+
+		DB.Polls.Update(poll);
+		await DB.SaveChangesAsync();
+
+		await RespondAsync("Updated the poll", new[] { poll.GetEmbed().Build() }, ephemeral: true);
+	}
+	
+	[ComponentInteraction("poll.*.result", true)]
+	public async Task AddPollRole(string id, string[] values)
+	{
+		await (Context.Interaction as SocketMessageComponent).DeferLoadingAsync(ephemeral: true);
+
+		Poll poll = await DB.Polls
+			.Include(x => x.Roles)
+			.FirstAsync(x => x.PollId == int.Parse(id));
+
+		SocketGuildUser user = Context.User as SocketGuildUser;
+		var selectedRoles = values.Select(x => Convert.ToUInt64(x));
+
+		List<ulong> FinalRoles = user.Roles.Select(x => x.Id).ToList();
+		FinalRoles.RemoveAll(x => !poll.Roles.Select(x => x.RoleId).Contains(x));
+		FinalRoles.AddRange(selectedRoles.Where(x => !FinalRoles.Contains(x)));
+
+		await user.ModifyAsync(x => x.RoleIds = FinalRoles);
+
+		await FollowupAsync("Updated your roles.", allowedMentions: AllowedMentions.None);
+	}
+
+	[ComponentInteraction("poll.*.launch", true)]
+	public async Task RespondWithPoll(string idStr)
+	{
+		int id = int.Parse(idStr);
+
+		Poll poll = await DB.Polls
+			.Include(x => x.Roles)
+			.FirstAsync(x => x.PollId == id);
+
+		var roles = poll.Roles;
+
+		roles = roles.Count > 20
+			? roles.GetRange(0, 20)
+			: roles;
+
+		int min = poll.Min > roles.Count || poll.Min < 0
+			? 1
+			: poll.Min;
+
+		int max = poll.Max > roles.Count || poll.Max < 1
+			? roles.Count
+			: poll.Max;
+
+		ComponentBuilder cb = new();
+		SelectMenuBuilder sb = new SelectMenuBuilder()
+			.WithCustomId($"poll.{id}.result")
+			.WithPlaceholder("select your roles")
+			.WithMinValues(min)
+			.WithMaxValues(max);
+
+		var guildRoles = Context.Guild.Roles;
+		var userRoles = (Context.User as IGuildUser).RoleIds;
+
+		roles.OnEach(x => sb.AddOption(guildRoles
+			.First(y => y.Id == x.RoleId).Name, x.RoleId.ToString(), x.Description, 
+				isDefault: userRoles.Contains(x.RoleId)));
+
+
+		roles = roles.Count > 20
+			? roles.GetRange(0, 20)
+			: roles;
+		cb.WithSelectMenu(sb);
+
+		await RespondAsync(embed: poll.GetEmbed().Build(), component: cb.Build(), ephemeral: true);
+	}
+}
