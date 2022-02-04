@@ -1,15 +1,13 @@
-//TODO: make this file look clean
-
 using CatCore.Client.Autocomplete;
 
 namespace CatCore.Client.Commands;
 
-[Group("poll", "Commands for creating and managing polls.")]
-public partial class PollCommands : InteractionModuleBase<SocketInteractionContext>
+[Group("poll", "commands for creating and managing polls.")]
+public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 {
 	public CatCoreContext DB;
 
-	[SlashCommand("add-role", "adds a role to a poll")]
+	[SlashCommand("add-role", "Adds a role to a poll.")]
 	public async Task Add
 	(
 		[Summary("poll", "The poll to add the role to.")]
@@ -17,7 +15,7 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 		Poll poll,
 		[Summary("role", "The role to add.")]
 		IRole role,
-		[Summary("description", "the text shown under the role name")]
+		[Summary("description", "The text shown under the role name.")]
 		string description = null)
 	{
 		var guildUser = (SocketGuildUser)Context.User;
@@ -37,14 +35,14 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 		if (role.Position <= userPosition || !hasPermission)
 		{
 			await RespondAsync($"You don't have permission to manage this role. Make sure it is below your highest" +
-				"role, and you have the `Manage Roles` permission");
+				"role, and you have the **`Manage Roles`** permission");
 			return;
 		}
 
 		if (role.Position <= botPosition || !hasPermission)
 		{
 			await RespondAsync($"I don't have permission to manage this role. Make sure it is below my highest" +
-				"role, and I have the `Manage Roles` permission");
+				"role, and I have the **`Manage Roles`** permission");
 			return;
 		}
 
@@ -68,7 +66,7 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 	}
 
 
-	[SlashCommand("new", "add a new poll")]
+	[SlashCommand("new", "Create a new poll.")]
 	public async Task New(
 		[Summary(null, "The name of the poll.")]
 		string name,
@@ -97,7 +95,7 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 		await RespondAsync("Added the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
 	}
 
-	[SlashCommand("delete", "deletes a new poll")]
+	[SlashCommand("delete", "Deletes a poll.")]
 	public async Task Delete
 	(
 		[Summary("poll", "The poll to delete.")]
@@ -106,10 +104,10 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 	{
 		DB.Polls.Remove(poll);
 		await DB.SaveChangesAsync();
-		await RespondAsync("Removed the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
+		await RespondAsync("Deleted the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
 	}
 	
-	[SlashCommand("remove-role", "deletes a role from a poll")]
+	[SlashCommand("remove-role", "Deletes a role from a poll.")]
 	public async Task DeleteRole
 	(
 		[Summary(null, "The poll to delete the roll from.")]
@@ -132,26 +130,26 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 		await RespondAsync("Removed the role!", ephemeral: true);
 	}
 
-	[SlashCommand("send", "sends a poll")]
+	[SlashCommand("send", "Sends a message users can use to launch a poll.")]
 	public async Task SendPoll
 	(
 		[Autocomplete(typeof(PollAutocompleteProvider))]
-		[Summary("poll", "the poll to send")]
+		[Summary("poll", "The poll to send.")]
 		Poll poll
 	) 
-		=> await RespondAsync(embed: poll.GetEmbed().Build(), component: new ComponentBuilder()
-			.WithButton("launch poll", $"poll.{poll.PollId}.launch", ButtonStyle.Primary).Build());
+		=> await RespondAsync(embed: poll.GetEmbed().Build(), components: new ComponentBuilder()
+			.WithButton("Launch poll!", $"poll.{poll.PollId}.launch", ButtonStyle.Primary).Build());
 
-	[SlashCommand("update", "modify a already created poll")]
+	[SlashCommand("update", "Modify a already created poll.")]
 	public async Task UpdatePoll(
 		[Autocomplete(typeof(PollAutocompleteProvider))]
-		[Summary("poll", "the poll to update.")]
+		[Summary("poll", "The poll to update.")]
 		Poll poll,
 		[Summary(null, "The name of the poll.")]
 		string name = null,
-		[Summary(null, "polls description.")]
+		[Summary(null, "The poll's description.")]
 		string? description = null,
-		[Summary(null, "polls embed footer.")]
+		[Summary(null, "The poll's embed footer.")]
 		string? footer = null,
 		[Summary(null, "The smallest number of options a user can choose (defaults to 1).")]
 		int? min = null,
@@ -218,7 +216,7 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 		ComponentBuilder cb = new();
 		SelectMenuBuilder sb = new SelectMenuBuilder()
 			.WithCustomId($"poll.{id}.result")
-			.WithPlaceholder("select your roles")
+			.WithPlaceholder("Select your roles!")
 			.WithMinValues(min)
 			.WithMaxValues(max);
 
@@ -235,6 +233,6 @@ public partial class PollCommands : InteractionModuleBase<SocketInteractionConte
 			: roles;
 		cb.WithSelectMenu(sb);
 
-		await RespondAsync(embed: poll.GetEmbed().Build(), component: cb.Build(), ephemeral: true);
+		await RespondAsync(embed: poll.GetEmbed().Build(), components: cb.Build(), ephemeral: true);
 	}
 }

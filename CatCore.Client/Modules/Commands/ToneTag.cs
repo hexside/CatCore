@@ -3,7 +3,7 @@ using CatCore.Client.Autocomplete;
 
 namespace CatCore.Client.Commands;
 
-[Group("tone-tag","tone-tag")]
+[Group("tone-tag", "tone-tag")]
 public class ToneTagCommands : InteractionModuleBase<SocketInteractionContext>
 {
 	public List<ToneTag> KnownTags { get; set; }
@@ -47,8 +47,7 @@ public class ToneTagCommands : InteractionModuleBase<SocketInteractionContext>
 		}
 
 		EmbedBuilder eb = new EmbedBuilder()
-			.WithTitle("Tone Tags")
-			.WithFooter("Tone Tags from ");
+			.WithTitle("Tone Tags");
 
 		tags.OnEach(x => eb.AddField(x.Key, x.Value.Description));
 		await RespondAsync(embed: eb.Build(), ephemeral: true);

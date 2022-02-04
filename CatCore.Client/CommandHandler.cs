@@ -1,13 +1,4 @@
-﻿using Discord;
-using Discord.Interactions;
-using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using CatCore.Utils;
+﻿using System.Reflection;
 using CatCore.Client.TypeConverters;
 using CatCore.Data;
 
@@ -37,7 +28,8 @@ namespace Client
 			{
 				await _logger.LogVerbose("Adding TypeConverters").ConfigureAwait(false);
 				_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
-				await _interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+				_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
+				await _interactionService.AddModulesAsync(Assembly.GetAssembly(typeof(CatCore.Client.Commands.PronounCommands)), _services);
 
 				_client.InteractionCreated += _handleInteraction;
 				
@@ -82,6 +74,12 @@ namespace Client
 		private async Task _handleInteraction(SocketInteraction interaction)
 		{
 			var context = new SocketInteractionContext(_client, interaction);
+			var db = (CatCoreContext)_services.GetService(typeof(CatCoreContext));
+			if (!db.Users.Any(x => x.DiscordID == context.User.Id))
+			{
+				await db.Users.AddAsync(new(true, context.User.Id));
+				await db.SaveChangesAsync();
+			}
 			await _interactionService.ExecuteCommandAsync(context, _services);
 		}
 	}

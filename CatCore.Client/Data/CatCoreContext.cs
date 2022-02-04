@@ -13,4 +13,9 @@ public class CatCoreContext : DbContext
 	{
 		DbPath = dbPath;
 	}
+	
+	protected override void OnConfiguring(DbContextOptionsBuilder builder)
+	{
+		builder.UseSqlite($"Data Source={DbPath}");
+	}
 }

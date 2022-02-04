@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace CatCore.Client.Commands;
 
 public class Groupless : InteractionModuleBase<SocketInteractionContext>
@@ -26,8 +24,7 @@ public class Groupless : InteractionModuleBase<SocketInteractionContext>
 		}
 
 		EmbedBuilder eb = new EmbedBuilder()
-			.WithTitle("Tone Tags")
-			.WithFooter("Tone Tags from ");
+			.WithTitle("Tone Tags");
 
 		tags.OnEach(x => eb.AddField(x.Key, x.Value.Description));
 		await RespondAsync(embed: eb.Build(), ephemeral: true);

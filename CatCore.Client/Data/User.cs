@@ -5,8 +5,8 @@
 		public bool IsDev { get; set; }
 		public int UserID { get; set; }
 		public ulong DiscordID { get; set; }
-		
-		public List<Pronoun> Pronouns { get; set; }
+
+		public List<Pronoun> Pronouns { get; set; } = new();
 
 		public User(bool isDev, ulong id)
 		{

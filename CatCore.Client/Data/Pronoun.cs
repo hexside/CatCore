@@ -1,4 +1,4 @@
-namespace CatCore;
+namespace CatCore.Data;
 
 public class Pronoun
 {
