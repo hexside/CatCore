@@ -11,12 +11,9 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 	public async Task Add
 	(
 		[Summary("poll", "The poll to add the role to.")]
-		[Autocomplete(typeof(PollAutocompleteProvider))]
-		Poll poll,
-		[Summary("role", "The role to add.")]
-		IRole role,
-		[Summary("description", "The text shown under the role name.")]
-		string description = null)
+		[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll,
+		[Summary("role", "The role to add.")] IRole role,
+		[Summary("description", "The text shown under the role name.")] string description = null)
 	{
 		var guildUser = (SocketGuildUser)Context.User;
 		int userPosition = guildUser.Roles
@@ -67,17 +64,15 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 
 
 	[SlashCommand("new", "Create a new poll.")]
-	public async Task New(
-		[Summary(null, "The name of the poll.")]
-		string name,
-		[Summary(null, "The poll's description.")]
-		string? description = null,
-		[Summary(null, "The poll's embed footer.")]
-		string? footer = null,
-		[Summary(null, "The smallest number of options a user can choose (defaults to 1 if too small).")]
-		int? min = 0,
+	public async Task New
+	(
+		[Summary(null, "The name of the poll.")] string name,
+		[Summary(null, "The poll's description.")] string? description = null,
+		[Summary(null, "The poll's embed footer.")] string? footer = null,
+		[Summary(null, "The smallest number of options a user can choose (defaults to 1 if too small).")] int? min = 0,
 		[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")]
-		int? max = 0)
+		int? max = 0
+	)
 	{
 		Poll poll = new()
 		{
@@ -99,8 +94,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 	public async Task Delete
 	(
 		[Summary("poll", "The poll to delete.")]
-		[Autocomplete(typeof(PollAutocompleteProvider))]
-		Poll poll)
+		[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll
+	)
 	{
 		DB.Polls.Remove(poll);
 		await DB.SaveChangesAsync();
@@ -111,10 +106,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 	public async Task DeleteRole
 	(
 		[Summary(null, "The poll to delete the roll from.")]
-		[Autocomplete(typeof(PollAutocompleteProvider))]
-		Poll poll,
-		[Summary(null, "The role to remove.")]
-		SocketRole discordRole
+		[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll,
+		[Summary(null, "The role to remove.")] SocketRole discordRole
 	)
 	{
 		PollRole role = poll.Roles.FirstOrDefault(x => x.RoleId == discordRole.Id);
@@ -134,25 +127,20 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 	public async Task SendPoll
 	(
 		[Autocomplete(typeof(PollAutocompleteProvider))]
-		[Summary("poll", "The poll to send.")]
-		Poll poll
+		[Summary("poll", "The poll to send.")] Poll poll
 	) 
 		=> await RespondAsync(embed: poll.GetEmbed().Build(), components: new ComponentBuilder()
 			.WithButton("Launch poll!", $"poll.{poll.PollId}.launch", ButtonStyle.Primary).Build());
 
 	[SlashCommand("update", "Modify a already created poll.")]
-	public async Task UpdatePoll(
+	public async Task UpdatePoll
+	(
 		[Autocomplete(typeof(PollAutocompleteProvider))]
-		[Summary("poll", "The poll to update.")]
-		Poll poll,
-		[Summary(null, "The name of the poll.")]
-		string name = null,
-		[Summary(null, "The poll's description.")]
-		string? description = null,
-		[Summary(null, "The poll's embed footer.")]
-		string? footer = null,
-		[Summary(null, "The smallest number of options a user can choose (defaults to 1).")]
-		int? min = null,
+		[Summary("poll", "The poll to update.")] Poll poll,
+		[Summary(null, "The name of the poll.")] string name = null,
+		[Summary(null, "The poll's description.")] string? description = null,
+		[Summary(null, "The poll's embed footer.")] string? footer = null,
+		[Summary(null, "The smallest number of options a user can choose (defaults to 1).")] int? min = null,
 		[Summary(null, "The largest number of options a user can choose (defaults to total options if too large.)")] 
 		int? max = null
 	)

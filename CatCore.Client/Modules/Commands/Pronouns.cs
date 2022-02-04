@@ -11,8 +11,7 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 	public async Task Add
 	(
 		[Summary("pronoun", "The pronoun to add.")]
-		[Autocomplete(typeof(PronounAutocompleteProvider))]
-		Pronoun pronoun
+		[Autocomplete(typeof(PronounAutocompleteProvider))] Pronoun pronoun
 	)
 	{
 		User user = await DB.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
@@ -41,17 +40,14 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 	
 	//TODO: Convert to modal.
 	[SlashCommand("new", "Creates a new pronoun.")]
-	public async Task New(
-	[Summary("subject", "They went to the park")]
-	string subjective,
-	[Summary("object", "I went to the park with them.")]
-	string objective,
-	[Summary("possessive-adj", "The park is near their house.")]
-	string possessiveAdj,
-	[Summary("possessive-pnoun", "That park is theirs.")]
-	string possessivePnoun,
-	[Summary("reflexive", "Someone went to the park by themself.")]
-	string reflexive)
+	public async Task New
+	(
+		[Summary("subject", "They went to the park")] string subjective,
+		[Summary("object", "I went to the park with them.")] string objective,
+		[Summary("possessive-adj", "The park is near their house.")] string possessiveAdj,
+		[Summary("possessive-pnoun", "That park is theirs.")] string possessivePnoun,
+		[Summary("reflexive", "Someone went to the park by themself.")] string reflexive
+	)
 	{
 		Pronoun pronoun = new()
 		{
@@ -95,10 +91,10 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 	[SlashCommand("remove", "Remove a pronoun to your profile.")]
 	public async Task Remove
 	(
-		[Summary("pronoun", "The pronoun to remove.")]
 		[Autocomplete(typeof(PronounAutocompleteProvider))]
-		[AutocompleteFromUserAtribute]
-		Pronoun pronoun)
+		[AutocompleteFromUserAtribute] 
+		[Summary("pronoun", "The pronoun to remove.")] Pronoun pronoun
+	)
 	{
 		User user = await DB.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
 

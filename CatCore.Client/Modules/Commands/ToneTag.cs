@@ -12,7 +12,7 @@ public class ToneTagCommands : InteractionModuleBase<SocketInteractionContext>
 	public async Task Resolve
 	(
 		[Summary("message-id", "The id of a message in this channel (see https://dis.gd/findmyid for info).")]
-		string messageId
+string messageId
 	)
 	{
 		if (!Regex.IsMatch(messageId, @"^\s*\d+\s*$"))
@@ -56,9 +56,8 @@ public class ToneTagCommands : InteractionModuleBase<SocketInteractionContext>
 	[SlashCommand("search", "Find a specified tone tag by it's name or alias.")]
 	public async Task Search
 	(
-		[Summary("tag", "The tone tag to search for.")]
 		[Autocomplete(typeof(ToneTagAutocompleteProvider))]
-		string tagInput
+		[Summary("tag", "The tone tag to search for.")] string tagInput
 	)
 	{
 		ToneTag? tag = KnownTags.FirstOrDefault(x => x.Matches(tagInput));
