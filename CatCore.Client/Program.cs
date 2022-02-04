@@ -46,7 +46,6 @@ internal class Program
 		client.Log += async (x) => await _logger.Log(x);
 		commands.Log += async (x) => await _logger.Log(x);
 		handler.Log += async x => await _logger.Log(x);
-		
 
 		_logger = new("Client", _settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
@@ -54,6 +53,10 @@ internal class Program
 
 		await handler.InitializeAsync();
 
+		int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
+		await _logger.LogInfo($"Loaded {count} commands.");
+		await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
+		
 		client.Ready += async () =>
 		{
 			if (_firstReady)
@@ -64,10 +67,6 @@ internal class Program
 				{
 					if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
 					else await commands.RegisterCommandsGloballyAsync(true);
-					
-					int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
-					await _logger.LogInfo($"Loaded {count} commands.");
-					await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
 				}
 				catch (HttpException ex)
 				{

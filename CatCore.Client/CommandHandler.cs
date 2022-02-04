@@ -77,7 +77,7 @@ namespace Client
 			var db = (CatCoreContext)_services.GetService(typeof(CatCoreContext));
 			if (!db.Users.Any(x => x.DiscordID == context.User.Id))
 			{
-				await db.Users.AddAsync(new(true, context.User.Id));
+				await db.Users.AddAsync(new(false, context.User.Id));
 				await db.SaveChangesAsync();
 			}
 			await _interactionService.ExecuteCommandAsync(context, _services);

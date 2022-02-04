@@ -8,6 +8,8 @@ public class CatCoreContext : DbContext
 	public DbSet<PollRole> PollRoles { get; set; }
 	public DbSet<Pronoun> Pronouns { get; set; }
 	public DbSet<User> Users { get; set; }
+	public DbSet<Message> Messages { get; set; }
+	public DbSet<UserMessage> UserMessages { get; set; }
 
 	public CatCoreContext(string dbPath = "CatCore.db")
 	{
