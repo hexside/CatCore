@@ -9,12 +9,14 @@ public class UserMessage
 	public int UserId { get; set; }
 	
 	public bool IsRead { get; set; }
-	
+	public bool IsSuppressed { get; set; }
+	public bool IsNotifiable => !IsRead && !IsSuppressed;
+
 	public UserMessage(Message message, User user)
 	{
 		Message = message;
 		User = user;
 	}
-	
+
 	public UserMessage() {}
 }

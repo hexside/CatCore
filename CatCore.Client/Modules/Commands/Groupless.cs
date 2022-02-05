@@ -53,4 +53,18 @@ public class Groupless : InteractionModuleBase<CatCoreInteractionContext>
 		Read,
 		All
 	}
+	
+	[ComponentInteraction("user.notifications.dismiss")]
+	public async Task DismissNotifications()
+	{
+		Context.DbUser.Messages
+			.Where(x => x.IsNotifiable)
+			.OnEach(x => x.IsSuppressed = true);
+
+		Db.Update(Context.DbUser);
+		await Db.SaveChangesAsync();
+
+		await RespondAsync("Hid your unread messages, remember you can always read them by running **`/mail`**", 
+			ephemeral: true);
+	}
 }

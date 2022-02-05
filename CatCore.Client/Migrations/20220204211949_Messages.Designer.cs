@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatCore.Client.Migrations
 {
     [DbContext(typeof(CatCoreContext))]
-    [Migration("20220204223141_Messages")]
+    [Migration("20220205072309_Messages")]
     partial class Messages
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -162,6 +162,9 @@ namespace CatCore.Client.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSuppressed")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("MessageId")

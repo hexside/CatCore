@@ -8,40 +8,19 @@ namespace CatCore.Client.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Messages_Users_UserId",
-                table: "Messages");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Messages_UserId",
-                table: "Messages");
-
-            migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "Messages");
+            migrationBuilder.AddColumn<bool>(
+                name: "IsSuppressed",
+                table: "UserMessages",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: false);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "UserId",
-                table: "Messages",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: 0);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_UserId",
-                table: "Messages",
-                column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Messages_Users_UserId",
-                table: "Messages",
-                column: "UserId",
-                principalTable: "Users",
-                principalColumn: "UserID",
-                onDelete: ReferentialAction.Cascade);
+            migrationBuilder.DropColumn(
+                name: "IsSuppressed",
+                table: "UserMessages");
         }
     }
 }

@@ -162,6 +162,9 @@ namespace CatCore.Client.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsSuppressed")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("MessageId")
                         .HasColumnType("INTEGER");
 

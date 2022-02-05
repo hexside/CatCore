@@ -45,11 +45,35 @@ namespace Client
 			}
 		}
 
-		private async Task SlashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)
+		private async Task SlashCommandExecuted(IApplicationCommandInfo command, IInteractionContext context, IResult result)
 		{
 			if (result.IsSuccess)
 			{
 				await _logger.LogDebug($"Successfully executed the command {command.Name}");
+				var unread = (context as CatCoreInteractionContext).DbUser.Messages
+					.Where(x => x.IsNotifiable)
+					.ToList();
+				if (unread.Count >= 1)
+				{
+					var eb = new EmbedBuilder()
+						.WithTitle("You have mail.")
+						.WithColor(Color.Orange);
+					if (unread.Count == 1)
+					{
+						eb.WithDescription("Run **`/mail`** to view the very import message " +
+							$"\"**{unread.First().Message.Title}**\".");
+					}
+					else
+					{
+						eb.WithDescription($"Run **`/mail`** to view your **{unread.Count}** unread messages.");
+						eb.AddField("Messages:", string.Concat(unread.Select(x => $"- **{x.Message.Title}**\n")));
+					}
+
+					var cb = new ComponentBuilder()
+						.WithButton("Dismiss", $"user.notifications.dismiss", ButtonStyle.Danger);
+
+					await context.Interaction.FollowupAsync(embed: eb.Build(), ephemeral: true, components: cb.Build());
+				}
 			}
 			else
 			{
