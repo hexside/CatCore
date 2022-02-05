@@ -5,7 +5,7 @@
 		public bool IsDev { get; set; }
 		public int UserID { get; set; }
 		public ulong DiscordID { get; set; }
-		public List<UserMessage> Messages { get; set; }
+		public List<UserMessage> Messages { get; set; } = new();
 
 		public List<Pronoun> Pronouns { get; set; } = new();
 
@@ -16,5 +16,11 @@
 		}
 
 		public User() { }
+
+		public List<Embed> GetEmbeds()
+			=> Messages
+				.Where(x => !x.IsRead)
+				.Select(x => x.Message.GetEmbed())
+				.ToList();
 	}
 }

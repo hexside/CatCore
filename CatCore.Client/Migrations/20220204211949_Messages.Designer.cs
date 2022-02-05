@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CatCore.Client.Migrations
 {
     [DbContext(typeof(CatCoreContext))]
-    [Migration("20220204211949_Messages")]
+    [Migration("20220204223141_Messages")]
     partial class Messages
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,12 +45,7 @@ namespace CatCore.Client.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("MessageId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Messages");
                 });
@@ -182,17 +177,6 @@ namespace CatCore.Client.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserMessages");
-                });
-
-            modelBuilder.Entity("CatCore.Data.Message", b =>
-                {
-                    b.HasOne("CatCore.Data.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CatCore.Data.PollRole", b =>

@@ -3,7 +3,7 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("pronoun", "commands for managing pronouns,")]
-public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
+public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
 	public CatCoreContext DB { get; set; }
 
@@ -73,10 +73,7 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 	[UserCommand("Pronouns")]
 	public async Task Pronouns(SocketUser user)
 	{
-		List<Pronoun> pronouns = (await DB.Users
-			.Include(x => x.Pronouns)
-			.FirstAsync(x => x.DiscordID == user.Id))
-			.Pronouns;
+		List<Pronoun> pronouns = Context.DbUser.Pronouns;
 
 		string responce = pronouns.Count switch
 		{
@@ -96,10 +93,8 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 		[Summary("pronoun", "The pronoun to remove.")] Pronoun pronoun
 	)
 	{
-		User user = await DB.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
-
-		user.Pronouns.Remove(pronoun);
-		DB.Users.Update(user);
+		Context.DbUser.Pronouns.Remove(pronoun);
+		DB.Users.Update(Context.DbUser);
 		await DB.SaveChangesAsync();
 		
 		await RespondAsync($"Removed {pronoun:**s**/**o**/**a**} from your profile.", ephemeral: true,

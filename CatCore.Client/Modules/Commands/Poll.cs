@@ -3,7 +3,7 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("poll", "commands for creating and managing polls.")]
-public class PollCommands : InteractionModuleBase<SocketInteractionContext>
+public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
 	public CatCoreContext DB;
 
