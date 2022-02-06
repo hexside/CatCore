@@ -3,10 +3,8 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("poll", "commands for creating and managing polls.")]
-public class PollCommands : InteractionModuleBase<SocketInteractionContext>
+public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
-	public CatCoreContext DB;
-
 	[SlashCommand("add-role", "Adds a role to a poll.")]
 	public async Task Add
 	(
@@ -43,7 +41,7 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 			return;
 		}
 
-		var roles = DB.PollRoles.Where(x => x.PollId == poll.PollId);
+		var roles = Context.Db.PollRoles.Where(x => x.PollId == poll.PollId);
 
 		if (roles.Any(x => x.RoleId == role.Id)) return;
 
@@ -56,8 +54,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 		};
 
 		poll.Roles.Add(newRole);
-		DB.Polls.Update(poll);
-		await DB.SaveChangesAsync();
+		Context.Db.Polls.Update(poll);
+		await Context.Db.SaveChangesAsync();
 
 		await RespondAsync($"Added {role.Mention} to the poll.", ephemeral: true, allowedMentions: AllowedMentions.None);
 	}
@@ -84,8 +82,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 			Min = min.Value
 		};
 
-		await DB.Polls.AddAsync(poll);
-		await DB.SaveChangesAsync();
+		await Context.Db.Polls.AddAsync(poll);
+		await Context.Db.SaveChangesAsync();
 
 		await RespondAsync("Added the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
 	}
@@ -97,8 +95,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 		[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll
 	)
 	{
-		DB.Polls.Remove(poll);
-		await DB.SaveChangesAsync();
+		Context.Db.Polls.Remove(poll);
+		await Context.Db.SaveChangesAsync();
 		await RespondAsync("Deleted the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
 	}
 	
@@ -117,8 +115,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 			return;
 		}
 		poll.Roles.Remove(role);
-		DB.Polls.Update(poll);
-		await DB.SaveChangesAsync();
+		Context.Db.Polls.Update(poll);
+		await Context.Db.SaveChangesAsync();
 
 		await RespondAsync("Removed the role!", ephemeral: true);
 	}
@@ -151,8 +149,8 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 		poll.Min = min ?? poll.Min;
 		poll.Max = max ?? poll.Max;
 
-		DB.Polls.Update(poll);
-		await DB.SaveChangesAsync();
+		Context.Db.Polls.Update(poll);
+		await Context.Db.SaveChangesAsync();
 
 		await RespondAsync("Updated the poll", new[] { poll.GetEmbed().Build() }, ephemeral: true);
 	}
@@ -162,7 +160,7 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 	{
 		await (Context.Interaction as SocketMessageComponent).DeferLoadingAsync(ephemeral: true);
 
-		Poll poll = await DB.Polls
+		Poll poll = await Context.Db.Polls
 			.Include(x => x.Roles)
 			.FirstAsync(x => x.PollId == int.Parse(id));
 
@@ -183,7 +181,7 @@ public class PollCommands : InteractionModuleBase<SocketInteractionContext>
 	{
 		int id = int.Parse(idStr);
 
-		Poll poll = await DB.Polls
+		Poll poll = await Context.Db.Polls
 			.Include(x => x.Roles)
 			.FirstAsync(x => x.PollId == id);
 

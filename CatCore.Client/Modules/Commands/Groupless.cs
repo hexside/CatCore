@@ -1,9 +1,11 @@
+using CatCore.Client.Autocomplete;
+
 namespace CatCore.Client.Commands;
 
-public class Groupless : InteractionModuleBase<SocketInteractionContext>
+public class Groupless : InteractionModuleBase<CatCoreInteractionContext>
 {	
 	public List<ToneTag> KnownTags { get; set; }
-	
+
 	[MessageCommand("Tone Tag")]
 	public async Task ToneTag(SocketMessage message)
 	{

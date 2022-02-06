@@ -4,7 +4,7 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("tone-tag", "tone-tag")]
-public class ToneTagCommands : InteractionModuleBase<SocketInteractionContext>
+public class ToneTagCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
 	public List<ToneTag> KnownTags { get; set; }
 	

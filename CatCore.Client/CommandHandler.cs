@@ -1,86 +1,105 @@
 ﻿using System.Reflection;
 using CatCore.Client.TypeConverters;
-using CatCore.Data;
 
-namespace Client
+namespace CatCore.Client.Commands;
+
+internal class CommandHandler
 {
-	internal class CommandHandler
+	private readonly DiscordSocketClient _client;
+	private readonly InteractionService _interactionService;
+	private readonly IServiceProvider _services;
+	private readonly Logger _logger;
+
+	public event Func<LogMessage, Task> Log;
+
+	public CommandHandler(DiscordSocketClient client, InteractionService interaction, IServiceProvider service)
 	{
-		private readonly DiscordSocketClient _client;
-		private readonly InteractionService _interactionService;
-		private readonly IServiceProvider _services;
-		private readonly Logger _logger;
+		_logger = new("Command Handler", LogSeverity.Debug);
+		_logger.LogFired += x => Log.Invoke(x);
+		_client = client;
+		_interactionService = interaction;
+		_services = service;
+	}
 
-		public event Func<LogMessage, Task> Log;
-
-		public CommandHandler(DiscordSocketClient client, InteractionService interaction, IServiceProvider service)
+	public async Task InitializeAsync()
+	{
+		try
 		{
-			_logger = new("Command Handler", LogSeverity.Debug);
-			_logger.LogFired += x => Log.Invoke(x);
-			_client = client;
-			_interactionService = interaction;
-			_services = service;
+			await _logger.LogVerbose("Adding TypeConverters").ConfigureAwait(false);
+			_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
+			_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
+			_interactionService.AddGenericTypeConverter<UserMessage>(typeof(UserMessageTypeConverter<>));
+			_interactionService.AddGenericTypeConverter<MessageGroup>(typeof(MessageGroupTypeConverter<>));
+			await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
+
+			_client.InteractionCreated += HandleInteraction;
+
+			// TODO: post interaction cleanup and error logging.
+
+			_interactionService.SlashCommandExecuted += SlashCommandExecuted;
 		}
-
-		public async Task InitializeAsync()
+		catch (Exception ex)
 		{
-			try
-			{
-				await _logger.LogVerbose("Adding TypeConverters").ConfigureAwait(false);
-				_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
-				_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
-				await _interactionService.AddModulesAsync(Assembly.GetAssembly(typeof(CatCore.Client.Commands.PronounCommands)), _services);
-
-				_client.InteractionCreated += _handleInteraction;
-				
-				// TODO: post interaction cleanup and error logging.
-
-				_interactionService.SlashCommandExecuted += _slashCommandExecuted;
-			}
-			catch (Exception ex)
-			{
-				await _logger.LogCritical("Failed to start interactions service.", ex);
-			}
+			await _logger.LogCritical("Failed to start interactions service.", ex);
 		}
+	}
 
-		private async Task _slashCommandExecuted(SlashCommandInfo command, IInteractionContext context, IResult result)
+	private async Task SlashCommandExecuted(IApplicationCommandInfo command, IInteractionContext context, IResult result)
+	{
+		if (result.IsSuccess)
 		{
-			if (result.IsSuccess)
+			await _logger.LogDebug($"Successfully executed the command {command.Name}");
+			var unread = (context as CatCoreInteractionContext).DbUser.Messages
+				.Where(x => x.IsNotifiable)
+				.ToList();
+			if (unread.Count >= 1)
 			{
-				await _logger.LogDebug($"Successfully executed the command {command.Name}");
-			}
-			else
-			{
-				await _interactionFailHandle(command.Name, result, context.Interaction as SocketInteraction);
-			}
-		}
+				var eb = new EmbedBuilder()
+					.WithTitle("You have mail.")
+					.WithColor(Color.Orange);
+				if (unread.Count == 1)
+				{
+					eb.WithDescription("Run **`/mail inbox`** to view the very import message " +
+						$"\"**{unread.First().Message.Title}**\".");
+				}
+				else
+				{
+					eb.WithDescription($"Run **`/mail inbox`** to view your **{unread.Count}** unread messages.");
+					eb.AddField("Messages:", string.Concat(unread.Select(x => $"- **{x.Message.Title}**\n")));
+				}
 
-		private async Task _interactionFailHandle(string name, IResult result, SocketInteraction interaction)
-		{
-			string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"} error \n```\n{result?.ErrorReason}\n```";
-			// interaction timed out.
-			if (!interaction.IsValidToken) return;
-			
-			if (interaction.HasResponded)
-			{
-				await interaction.RespondAsync(error, ephemeral: true);
-			}
-			else
-			{
-				await interaction.FollowupAsync(error, ephemeral: true);
+				var cb = new ComponentBuilder()
+					.WithButton("Dismiss", $"user.notifications.dismiss", ButtonStyle.Danger);
+
+				await context.Interaction.FollowupAsync(embed: eb.Build(), ephemeral: true, components: cb.Build());
 			}
 		}
-
-		private async Task _handleInteraction(SocketInteraction interaction)
+		else
 		{
-			var context = new SocketInteractionContext(_client, interaction);
-			var db = (CatCoreContext)_services.GetService(typeof(CatCoreContext));
-			if (!db.Users.Any(x => x.DiscordID == context.User.Id))
-			{
-				await db.Users.AddAsync(new(true, context.User.Id));
-				await db.SaveChangesAsync();
-			}
-			await _interactionService.ExecuteCommandAsync(context, _services);
+			await InteractionFailHandle(command.Name, result, context.Interaction as SocketInteraction);
 		}
+	}
+
+	private static async Task InteractionFailHandle(string name, IResult result, SocketInteraction interaction)
+	{
+		string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"} error \n```\n{result?.ErrorReason}\n```";
+		// interaction timed out.
+		if (!interaction.IsValidToken) return;
+
+		if (interaction.HasResponded)
+		{
+			await interaction.RespondAsync(error, ephemeral: true);
+		}
+		else
+		{
+			await interaction.FollowupAsync(error, ephemeral: true);
+		}
+	}
+
+	private async Task HandleInteraction(SocketInteraction interaction)
+	{
+		var db = (CatCoreContext)_services.GetService(typeof(CatCoreContext));
+		var context = new CatCoreInteractionContext(_client, interaction, db);
+		await _interactionService.ExecuteCommandAsync(context, _services);
 	}
 }

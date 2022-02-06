@@ -1,5 +1,7 @@
+using MailSearchType = CatCore.Client.Commands.MailCommands.MailSearchType;
 
 namespace CatCore.Client.Autocomplete;
+
 internal class PronounAutocompleteProvider : AutocompleteHandler
 {
 	public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
@@ -63,6 +65,57 @@ internal class ToneTagAutocompleteProvider : AutocompleteHandler
 
 		return Task.FromResult(AutocompletionResult.FromSuccess(resolvedTags.Select(x =>
 			new AutocompleteResult(x.DefaultName, x.DefaultName))));
+	}
+}
+
+internal class UserMessageAutocompleteProvider : AutocompleteHandler
+{
+	public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
+		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+	{
+		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var searchType = (MailSearchType)Enum.Parse(typeof(MailSearchType), (string)autocompleteInteraction.Data.Options
+			.First(x => x.Name == "filter")
+			.Value);
+		var mail = (await db.Users
+			.Include(x => x.Messages)
+			.ThenInclude(x => x.Message)
+			.FirstAsync(x => x.DiscordID == context.User.Id))
+			.Messages;
+		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
+
+		var resolved = mail
+			.Where(x => (x.Message.Title + x.Message.Description)
+				.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
+			.Where(x => searchType != MailSearchType.Read || x.IsRead)
+			.Where(x => searchType != MailSearchType.Unread || !x.IsRead)
+			.RangeOrDefault(0, 20)
+			.Select(x => new AutocompleteResult(x.Message.Title, x.UserMessageId.ToString()));
+
+		return AutocompletionResult.FromSuccess(resolved);
+	}
+}
+
+internal class MessageGroupAutocompleteProvider : AutocompleteHandler
+{
+	public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
+		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+	{
+		bool fromUser = parameter.Attributes.Any(x => x is AutocompleteFromUserAtribute);
+		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var user = ((CatCoreInteractionContext)context).DbUser;
+		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
+		
+		var groups = (await db.MessageGroups
+			.Include(x => x.VisiableTo)
+			.Where(x => x.IsPublic || x.VisiableTo.Contains(user) || user.IsDev)
+			.Where(x => !fromUser || user.MessageGroups.Contains(x))
+			.ToListAsync())
+			.Where(x => x.Name.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
+			.RangeOrDefault(0, 20)
+			.Select(x => new AutocompleteResult(x.Name, x.MessageGroupId.ToString()));
+
+		return AutocompletionResult.FromSuccess(groups);
 	}
 }
 

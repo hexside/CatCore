@@ -5,6 +5,7 @@ global using Discord.WebSocket;
 global using CatCore.Utils;
 global using CatCore.Data;
 global using Microsoft.EntityFrameworkCore;
+global using CatCore.Client.Commands;
 
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -19,18 +20,18 @@ internal class Program
 	private static readonly ClientSettings _settings = new("clientSettings.json");
 
 	private static ServiceProvider _configureServices() => new ServiceCollection()
-		.AddDbContext<CatCoreContext>(ServiceLifetime.Transient)
-		.AddSingleton(new DiscordSocketClient(new() 
-		{ 
-			LogLevel = LogSeverity.Debug, 
-			GatewayIntents = GatewayIntents.Guilds 
+		.AddDbContext<CatCoreContext>()
+		.AddSingleton(new DiscordSocketClient(new()
+		{
+			LogLevel = LogSeverity.Debug,
+			GatewayIntents = GatewayIntents.Guilds
 		}))
-		.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), 
-			new() 
-			{ 
-				LogLevel=LogSeverity.Debug, 
+		.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(),
+			new()
+			{
+				LogLevel = LogSeverity.Debug,
 				DefaultRunMode = RunMode.Async
-		}))
+			}))
 		.AddSingleton<CommandHandler>(x => new(x.GetRequiredService<DiscordSocketClient>(),
 			x.GetRequiredService<InteractionService>(), x))
 		.AddSingleton(JsonSerializer.Deserialize<List<ToneTag>>(File.ReadAllText("tags.json")))
@@ -46,13 +47,16 @@ internal class Program
 		client.Log += async (x) => await _logger.Log(x);
 		commands.Log += async (x) => await _logger.Log(x);
 		handler.Log += async x => await _logger.Log(x);
-		
 
 		_logger = new("Client", _settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
 		await _logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
 
 		await handler.InitializeAsync();
+
+		int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
+		await _logger.LogInfo($"Loaded {count} commands.");
+		await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
 
 		client.Ready += async () =>
 		{
@@ -64,10 +68,6 @@ internal class Program
 				{
 					if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
 					else await commands.RegisterCommandsGloballyAsync(true);
-					
-					int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
-					await _logger.LogInfo($"Loaded {count} commands.");
-					await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
 				}
 				catch (HttpException ex)
 				{

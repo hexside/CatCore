@@ -3,10 +3,8 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("pronoun", "commands for managing pronouns,")]
-public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
+public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
-	public CatCoreContext DB { get; set; }
-
 	[SlashCommand("add", "Add a pronoun to your profile.")]
 	public async Task Add
 	(
@@ -14,7 +12,7 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 		[Autocomplete(typeof(PronounAutocompleteProvider))] Pronoun pronoun
 	)
 	{
-		User user = await DB.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
+		User user = await Context.Db.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
 
 		List<Pronoun> pronouns = user.Pronouns;
 		
@@ -25,8 +23,8 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 		}
 
 		user.Pronouns.Add(pronoun);
-		DB.Users.Update(user);
-		await DB.SaveChangesAsync();
+		Context.Db.Users.Update(user);
+		await Context.Db.SaveChangesAsync();
 		
 		await RespondAsync($"added **{pronoun:s/o/p}** to your profile", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
@@ -58,14 +56,14 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 			Reflexive = reflexive
 		};
 
-		if ((await DB.Pronouns.ToListAsync()).Any(x => x.Matches(pronoun)))
+		if ((await Context.Db.Pronouns.ToListAsync()).Any(x => x.Matches(pronoun)))
 		{
 			await RespondAsync("That pronoun already exists.", ephemeral: true);
 			return;
 		}
 
-		await DB.Pronouns.AddAsync(pronoun);
-		await DB.SaveChangesAsync();
+		await Context.Db.Pronouns.AddAsync(pronoun);
+		await Context.Db.SaveChangesAsync();
 
 		await RespondAsync($"Created the pronoun **{pronoun:s/o/a/r}**.", ephemeral: true);
 	}
@@ -73,10 +71,7 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 	[UserCommand("Pronouns")]
 	public async Task Pronouns(SocketUser user)
 	{
-		List<Pronoun> pronouns = (await DB.Users
-			.Include(x => x.Pronouns)
-			.FirstAsync(x => x.DiscordID == user.Id))
-			.Pronouns;
+		List<Pronoun> pronouns = Context.DbUser.Pronouns;
 
 		string responce = pronouns.Count switch
 		{
@@ -96,11 +91,9 @@ public class PronounCommands : InteractionModuleBase<SocketInteractionContext>
 		[Summary("pronoun", "The pronoun to remove.")] Pronoun pronoun
 	)
 	{
-		User user = await DB.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
-
-		user.Pronouns.Remove(pronoun);
-		DB.Users.Update(user);
-		await DB.SaveChangesAsync();
+		Context.DbUser.Pronouns.Remove(pronoun);
+		Context.Db.Users.Update(Context.DbUser);
+		await Context.Db.SaveChangesAsync();
 		
 		await RespondAsync($"Removed {pronoun:**s**/**o**/**a**} from your profile.", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
