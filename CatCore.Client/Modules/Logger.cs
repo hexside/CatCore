@@ -28,8 +28,8 @@ public class Logger : IDisposable
 		Messages = new List<LogMessage>();
 		LogLevel = severity;
 
-		LogFired += _fireWebhook;
-		Log("Logger", "Started Logger", LogSeverity.Info).ConfigureAwait(false);
+		LogFired += FireWebhook;
+		Log("Logger", "Started Logger", LogSeverity.Info);
 	}
 
 	public Logger(string source, string webhookUrl, LogSeverity severity = LogSeverity.Info, 
@@ -41,11 +41,11 @@ public class Logger : IDisposable
 		WebhookLevel = webhookSeverity;
 		Messages = new List<LogMessage>();
 
-		LogFired += _fireWebhook;
-		Log("Logger", "Started Logger", LogSeverity.Info).ConfigureAwait(false);
+		LogFired += FireWebhook;
+		Log("Logger", "Started Logger", LogSeverity.Info);
 	}
 
-	private async Task _fireWebhook(LogMessage message)
+	private async Task FireWebhook(LogMessage message)
 	{
 		if (_client is null)
 			return;
@@ -66,53 +66,48 @@ public class Logger : IDisposable
 		await _client.SendMessageAsync(embeds: new [] { builder.Build() });
 	}
 
-	// TODO: make logging not async
-	public async Task Log (LogMessage message)
+	public void Log (LogMessage message)
 	{
 		Messages.Add(message);
-		await LogFired.Invoke(message);
+		LogFired.Invoke(message);
 	}
 
-	public async Task Log (string source, string message, LogSeverity severity, Exception? exception = null)
+	public void Log (string source, string message, LogSeverity severity, Exception? exception = null)
 	{
 		LogMessage lMessage = new (severity, source, message, exception);
-		await Log(lMessage);
+		Log(lMessage);
 	}
 
 	#region log methods
-	public async Task LogDebug (string message, Exception? exception = null) 
-		=> await LogDebug(Source, message, exception);
-	public async Task LogDebug (string source, string message, Exception? exception = null)
-		=> await Log(source, message, LogSeverity.Debug, exception);
+	public void LogDebug (string message, Exception? exception = null) 
+		=> LogDebug(Source, message, exception);
+	public void LogDebug (string source, string message, Exception? exception = null)
+		=> Log(source, message, LogSeverity.Debug, exception);
 
-	public async Task LogVerbose (string message, Exception? exception = null) 
-		=> await LogVerbose(Source, message, exception);
-	public async Task LogVerbose (string source, string message, Exception? exception = null)
-		=> await Log(source, message, LogSeverity.Verbose, exception);
+	public void LogVerbose (string message, Exception? exception = null) 
+		=> LogVerbose(Source, message, exception);
+	public void LogVerbose (string source, string message, Exception? exception = null)
+		=> Log(source, message, LogSeverity.Verbose, exception);
 
-	public async Task LogInfo (string message, Exception? exception = null) 
-		=> await LogInfo(Source, message, exception);
-	public async Task LogInfo (string source, string message, Exception? exception = null)
-		=> await Log(source, message, LogSeverity.Info, exception);
+	public void LogInfo (string message, Exception? exception = null) 
+		=> LogInfo(Source, message, exception);
+	public void LogInfo (string source, string message, Exception? exception = null)
+		=> Log(source, message, LogSeverity.Info, exception);
 
-	public async Task LogWarning (string message, Exception? exception = null) 
-		=> await LogWarning(Source, message, exception);
-	public async Task LogWarning (string source, string message, Exception? exception = null)
-		=> await Log(source, message, LogSeverity.Warning, exception);
+	public void LogWarning (string message, Exception? exception = null) 
+		=> LogWarning(Source, message, exception);
+	public void LogWarning (string source, string message, Exception? exception = null)
+		=> Log(source, message, LogSeverity.Warning, exception);
 
-	public async Task LogError (string message, Exception? exception = null) 
-		=> await LogError(Source, message, exception);
-	public async Task LogError (string source, string message, Exception? exception = null)
-		=> await Log(source, message, LogSeverity.Error, exception);
+	public void LogError (string message, Exception? exception = null) 
+		=> LogError(Source, message, exception);
+	public void LogError (string source, string message, Exception? exception = null)
+		=> Log(source, message, LogSeverity.Error, exception);
 
-	public async Task LogCritical (string message, Exception? exception = null) 
-		=> await LogCritical(Source, message, exception);
-	public async Task LogCritical (string source, string message, Exception? exception = null)
-		=> await Log(source, message, LogSeverity.Critical, exception);
-
-	public async Task LogTest() => 
-		await Task.Run(() => Enum.GetValues<LogSeverity>().OnEach(async e => 
-			await Log("Logger", $"This is a {e} message.", e)));
+	public void LogCritical (string message, Exception? exception = null) 
+		=> LogCritical(Source, message, exception);
+	public void LogCritical (string source, string message, Exception? exception = null)
+		=> Log(source, message, LogSeverity.Critical, exception);
 	#endregion
 
 	public void Dispose()

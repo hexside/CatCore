@@ -44,18 +44,30 @@ internal class Program
 		var commands = services.GetRequiredService<InteractionService>();
 		var handler = services.GetRequiredService<CommandHandler>();
 
-		client.Log += async (x) => await _logger.Log(x);
-		commands.Log += async (x) => await _logger.Log(x);
-		handler.Log += async x => await _logger.Log(x);
+		client.Log += x =>
+		{
+			_logger.Log(x);
+			return Task.CompletedTask;
+		};
+		commands.Log += x =>
+		{
+			_logger.Log(x);
+			return Task.CompletedTask;
+		};
+		handler.Log += x =>
+		{
+			_logger.Log(x);
+			return Task.CompletedTask;
+		};
 
 		_logger = new("Client", _settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
-		await _logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
+		_logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
 
 		await handler.InitializeAsync();
 
 		int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
-		await _logger.LogInfo($"Loaded {count} commands.");
+		_logger.LogInfo($"Loaded {count} commands.");
 		await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
 
 		client.Ready += async () =>
@@ -63,7 +75,7 @@ internal class Program
 			if (_firstReady)
 			{
 				_firstReady = false;
-				await _logger.LogVerbose("Starting interaction service.").ConfigureAwait(false);
+				_logger.LogVerbose("Starting interaction service.");
 				try
 				{
 					if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
@@ -71,7 +83,8 @@ internal class Program
 				}
 				catch (HttpException ex)
 				{
-					await _logger.LogCritical($"Failed to regester commands because {ex}, (see {JsonSerializer.Serialize(ex.Errors)})").ConfigureAwait(false);
+					_logger.LogCritical($"Failed to regester commands because {ex}, " + 
+						$"(see {JsonSerializer.Serialize(ex.Errors)})");
 				}
 			}
 		};

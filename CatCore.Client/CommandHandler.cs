@@ -25,7 +25,7 @@ internal class CommandHandler
 	{
 		try
 		{
-			await _logger.LogVerbose("Adding TypeConverters").ConfigureAwait(false);
+			_logger.LogVerbose("Adding TypeConverters");
 			_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<UserMessage>(typeof(UserMessageTypeConverter<>));
@@ -40,7 +40,7 @@ internal class CommandHandler
 		}
 		catch (Exception ex)
 		{
-			await _logger.LogCritical("Failed to start interactions service.", ex);
+			_logger.LogCritical("Failed to start interactions service.", ex);
 		}
 	}
 
@@ -48,7 +48,7 @@ internal class CommandHandler
 	{
 		if (result.IsSuccess)
 		{
-			await _logger.LogDebug($"Successfully executed the command {command.Name}");
+			_logger.LogDebug($"Successfully executed the command {command.Name}");
 			var unread = (context as CatCoreInteractionContext).DbUser.Messages
 				.Where(x => x.IsNotifiable)
 				.ToList();
