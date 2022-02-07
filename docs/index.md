@@ -9,4 +9,4 @@ CatCore is a utilty bot designed for LGBTQ+ comunity servers. It has a number of
 - [ ] Automoderation 
 
 ## Support
-You can join our support server <coming soon> or run `/help` <also coming soon>
+You can join our support server or run ``/help``
