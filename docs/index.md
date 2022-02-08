@@ -1,5 +1,5 @@
 # CatCore
-CatCore is a utilty bot designed for LGBTQ+ comunity servers. It has a number of usefull utilities including a non-role bound pronoun picker and tone tag resolver.
+CatCore is a utility bot designed for LGBTQ+ comunity servers. It has a number of usefull tools including a non-role bound pronoun picker and tone tag resolver.
 
 ## Features
 - [x] Tone Tag Resolver
