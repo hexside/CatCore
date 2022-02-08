@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Mail
+parent: Commands
 ---
 
 <details open markdown="block">
@@ -30,10 +31,10 @@ Slash Command
 /mail inbox <filter> <message> 
 ```
 
-| arg     | type               | use                                     |
-|---------|--------------------|-----------------------------------------|
-| filter  | Mail Search Filter | Determines what message you want to see |
-| message | Mail Message       | Chooses the message to show             |
+| arg     | type                                               | use                                     |
+|---------|----------------------------------------------------|-----------------------------------------|
+| filter  | Mail Search Filter                                 | Chooses the message to show             |
+| message | [Mail Message](index.md#autocomplete-option-types) | Determines what message you want to see |
 
 This command lets you search the contents of your inbox and select a specific message to view. Viewing a message for the first time will mark it as read so it's easier to find mesages that need your attention. 
 
@@ -47,9 +48,9 @@ Slash Command
 /mail join <group>
 ```
 
-| arg   | type          | use               |
-|-------|---------------|-------------------|
-| group | Message Group | The group to join |
+| arg   | type                                                | use               |
+|-------|-----------------------------------------------------|-------------------|
+| group | [Message Group](index.md#autocomplete-option-types) | The group to join |
 
 This command will subscribe you to a message group, delivering all of it's new messages to your inbox. You will not older messages from the group.
 
@@ -63,8 +64,8 @@ Slash Command
 /mail leave <group>
 ```
 
-| arg   | type          | use                |
-|-------|---------------|--------------------|
-| group | Message Group | The group to leave |
+| arg   | type                                                  | use                |
+|-------|-------------------------------------------------------|--------------------|
+| group | [Message Group](index.md#autocomplete-option-types) | The group to leave |
 
 This command will unsubscribe you to a message group, dissabling delivery of it's messages. Messages you have received from the group will not be deleted.

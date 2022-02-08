@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Tone-Tag
+parent: Commands
 ---
 
 <details open markdown="block">
@@ -58,8 +59,8 @@ Slash Command
 /tone-tag search <tag>
 ```
 
-| arg | type     | use                                   |
-|-----|----------|---------------------------------------|
-| tag | Tone Tag | A tone tag to load the defintion for. |
+| arg | type                                           | use                                   |
+|-----|------------------------------------------------|---------------------------------------|
+| tag | [Tone Tag](index.md#autocomplete-option-types) | A tone tag to load the defintion for. |
 
 This command allows you to search the database of tone tags to find the perfect one for every situation. It supports searching names (like Genuine), aliases (like gen), and definitions (most of the time anyway).

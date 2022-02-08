@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Pronoun
+parent: Commands
 ---
 
 <details open markdown="block">
@@ -26,9 +27,9 @@ Slash Command
 /pronoun add <pronoun> 
 ```
 
-| arg     | type    | use                                |
-|---------|---------|------------------------------------|
-| pronoun | Pronoun | The pronoun to add to your profile |
+| arg     | type                                          | use                                |
+|---------|-----------------------------------------------|------------------------------------|
+| pronoun | [Pronoun](index.md#autocomplete-option-types) | The pronoun to add to your profile |
 
 This command adds an already created pronoun to your user profile, to use it type ``/pronoun add`` in the message bar and use the autocompletion to select a pronoun. If you don't see the pronoun you want, run [``/pronoun new``](#pronoun-new) to add it to your profile. If you decide to remove it run [``/pronoun remove``](#pronoun-remove)
 
@@ -82,9 +83,9 @@ Slash Command
 /pronoun remove <pronoun> 
 ```
 
-| arg     | type    | use                                     |
-|---------|---------|-----------------------------------------|
-| pronoun | pronoun | The pronoun to remove from your profile |
+| arg     | type                                          | use                                     |
+|---------|-----------------------------------------------|-----------------------------------------|
+| pronoun | [Pronoun](index.md#autocomplete-option-types) | The pronoun to remove from your profile |
 
 This command will remove a pronoun from your profile, you can always re-add it by running [``/pronoun add``](#pronoun-add).
 
