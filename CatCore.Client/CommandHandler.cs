@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using CatCore.Client.TypeConverters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CatCore.Client.Commands;
 
@@ -76,23 +78,46 @@ internal class CommandHandler
 		}
 		else
 		{
-			await InteractionFailHandle(command.Name, result, context.Interaction as SocketInteraction);
+			await InteractionFailHandle(command.Name, result, (CatCoreInteractionContext)context);
 		}
 	}
 
-	private static async Task InteractionFailHandle(string name, IResult result, SocketInteraction interaction)
+	private static async Task InteractionFailHandle(string name, IResult result, CatCoreInteractionContext context)
 	{
-		string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"} error \n```\n{result?.ErrorReason}\n```";
+		var interaction = context.Interaction;
+		
+		string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"}" +
+			$"\n```diff\n- {result?.ErrorReason.Replace("\n", "\n-")}\n```";
 		// interaction timed out.
 		if (!interaction.IsValidToken) return;
 
-		if (interaction.HasResponded)
+		if (!interaction.HasResponded)
 		{
 			await interaction.RespondAsync(error, ephemeral: true);
 		}
 		else
 		{
 			await interaction.FollowupAsync(error, ephemeral: true);
+		}
+
+		// Send additional information to developers
+		if (context.DbUser.IsDev)
+		{
+			JsonSerializerOptions options = new()
+			{
+				WriteIndented = true,
+				IgnoreReadOnlyFields = false,
+				IgnoreReadOnlyProperties = false,
+				ReferenceHandler = ReferenceHandler.IgnoreCycles,
+			};
+			string message = $"{JsonSerializer.Serialize(context.DbUser, options)}\n{JsonSerializer.Serialize((object)result, options)}";
+
+			using MemoryStream ms = new();
+			using StreamWriter sw = new(ms);
+			sw.Write(message);
+			sw.Flush();
+			ms.Position = 0;
+			await interaction.FollowupWithFileAsync(ms, "ErrorDetails.json", "Error details");
 		}
 	}
 

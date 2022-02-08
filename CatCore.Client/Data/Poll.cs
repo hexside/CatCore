@@ -16,7 +16,7 @@ namespace CatCore.Data
 		public string? Footer { get; set; }
 		public int Min { get; set; }
 		public int Max { get; set; }
-		public List<PollRole> Roles { get; set; }
+		public List<PollRole> Roles { get; set; } = new();
 
 		public EmbedBuilder GetEmbed()
 			=> new EmbedBuilder()

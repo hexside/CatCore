@@ -19,7 +19,6 @@ CatCore has a static list of tone tags that were curated by the developers, if y
 
 ## Tone Tag
 {: .d-inline-block }
-
 Context Menu Command
 {: .label .label-blue }
 
@@ -30,10 +29,8 @@ This command can be activated by right clicking a message on the desktop client,
 
 ## Tone-Tag resolve 
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
-
 Temporary
 {: .label .label-yellow }
 
@@ -51,7 +48,6 @@ This command will resolve tone tags in a specific message, in order to specify t
 
 ## Tone-Tag Search
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 

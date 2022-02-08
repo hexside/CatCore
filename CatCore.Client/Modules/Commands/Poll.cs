@@ -3,6 +3,8 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("poll", "commands for creating and managing polls.")]
+[RequireUserPermission(GuildPermission.ManageRoles)]
+[RequireBotPermission(GuildPermission.ManageRoles)]
 public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
 	[SlashCommand("add-role", "Adds a role to a poll.")]
@@ -22,19 +24,18 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		int botPosition = Context.Guild.CurrentUser.Roles
 			.Select(x => x.Position)
 			.OrderByDescending(x => x)
-			.First();
+			.First();;
+			
+		bool isOwner = Context.Guild.OwnerId == Context.User.Id;
 
-		bool hasPermission = Context.Guild.CurrentUser.GuildPermissions.ManageRoles;
-		bool userPermission = guildUser.GuildPermissions.ManageRoles;
-
-		if (role.Position <= userPosition || !hasPermission)
+		if (!isOwner && role.Position >= userPosition)
 		{
 			await RespondAsync($"You don't have permission to manage this role. Make sure it is below your highest" +
 				"role, and you have the **`Manage Roles`** permission");
 			return;
 		}
 
-		if (role.Position <= botPosition || !hasPermission)
+		if (role.Position >= botPosition)
 		{
 			await RespondAsync($"I don't have permission to manage this role. Make sure it is below my highest" +
 				"role, and I have the **`Manage Roles`** permission");
@@ -51,6 +52,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		{
 			Description = description,
 			RoleId = role.Id,
+			Poll = poll
 		};
 
 		poll.Roles.Add(newRole);
@@ -168,8 +170,9 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		var selectedRoles = values.Select(x => Convert.ToUInt64(x));
 
 		List<ulong> FinalRoles = user.Roles.Select(x => x.Id).ToList();
-		FinalRoles.RemoveAll(x => !poll.Roles.Select(x => x.RoleId).Contains(x));
+		FinalRoles.RemoveAll(x => poll.Roles.Select(x => x.RoleId).Contains(x) && !selectedRoles.Contains(x));
 		FinalRoles.AddRange(selectedRoles.Where(x => !FinalRoles.Contains(x)));
+		FinalRoles.Remove(Context.Guild.EveryoneRole.Id);
 
 		await user.ModifyAsync(x => x.RoleIds = FinalRoles);
 

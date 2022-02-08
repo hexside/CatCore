@@ -1,7 +1,7 @@
 remote_theme: pmarsceill/just-the-docs
 
 aux_links:
-  "Get Support":
+  "Support Server":
     - "//discord.gg/563mXJBvtP"
 
 gh_edit_link: false

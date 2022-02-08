@@ -23,7 +23,6 @@ Mail groups are used to determines what notifications you will get (for example 
 
 ## Mail Inbox
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 
@@ -40,7 +39,6 @@ This command lets you search the contents of your inbox and select a specific me
 
 ## Mail Join
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 
@@ -56,7 +54,6 @@ This command will subscribe you to a message group, delivering all of it's new m
 
 ## Mail Leave
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 

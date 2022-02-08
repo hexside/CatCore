@@ -31,7 +31,10 @@ Slash Commands are commands regestered by an application and appear above the ch
 ### Autocomplete Option Types
 Some command options may populate a list of responces from the bots database. These options are populated using a Discord feature called Autocomplete. When CatCore sends Autocomplete options they represent an internal type stored in it's database. Because that type of input is not supported by Discord directly you **must** select one of the autocomplete options for the command to work properly.
 
+### Non Required Options
+Some commands have options which may choose to provide. These options allow for additional customization but are not detrimental when left empty. These options have a question mark after their type in the argument table.
+
 ## Context Menu Commands
 Context menu commands are displayed on the right click menu of users and messages in the Web and Desktop versions of Discord. In order to use a context menu command right click a message or user, select the apps sub-menu, and click a command. 
 
-![An example context command](images/tone_tag_resolve.png))
+![An example context command](images/tone_tag_resolve.png)

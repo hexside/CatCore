@@ -19,7 +19,6 @@ CatCore's Pronouns feature is designed to full user customization, including usi
 
 ## Pronoun Add 
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 
@@ -37,7 +36,6 @@ This command adds an already created pronoun to your user profile, to use it typ
 
 ## Pronoun Get
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 
@@ -53,23 +51,21 @@ This command will lookup a users preferred pronouns and relay them to you. If a 
 
 ## Pronoun New
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
-
 Temporary
 {: .label .label-yellow }
 ```xml
 /pronoun new <subject> <object> <possessive-adj> <possessive-pnoun> <reflexive>
 ```
 
-| arg               | type   | use                                                                 |
-|-------------------|--------|---------------------------------------------------------------------|
-| subject           | String | The subject pronoun (**they** went to the park)                     |
-| object            | String | The object pronoun (I went to the park with **them**)               |
-| possessive-adj    | String | The possessive adjective pronoun (the park is near **their** house) |
-| possessive-ponoun | String | The possessive pronoun pronoun (that bench is **theirs**)           |
-| reflexive         | String | The reflexive pronoun (someone went to the park by **themself**)    |
+| arg              | type   | use                                                                 |
+|------------------|--------|---------------------------------------------------------------------|
+| subject          | String | The subject pronoun (**they** went to the park)                     |
+| object           | String | The object pronoun (I went to the park with **them**)               |
+| possessive-adj   | String | The possessive adjective pronoun (the park is near **their** house) |
+| possessive-pnoun | String | The possessive pronoun pronoun (that bench is **theirs**)           |
+| reflexive        | String | The reflexive pronoun (someone went to the park by **themself**)    |
 
 This command will create a new pronoun you can add to your profile by running [``/pronoun add``](#pronoun-add), this command will be replaced with a [modal](https://github.com/Discord-Net-Labs/Discord.Net-Labs/pull/428) when they are publicly available.
 
@@ -91,7 +87,6 @@ This command will remove a pronoun from your profile, you can always re-add it b
 
 ## Pronoun Try
 {: .d-inline-block }
-
 Slash Command
 {: .label .label-green }
 

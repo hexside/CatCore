@@ -31,14 +31,13 @@ internal class PronounAutocompleteProvider : AutocompleteHandler
 internal class PollAutocompleteProvider : AutocompleteHandler
 {
 	public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
-		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+		IAutocompleteInteraction interaction, IParameterInfo parameter, IServiceProvider services)
 	{
-		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
-		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
-
-		var polls = db.Polls
-			.Where(x => x.ToString(true).Contains(currentValue, StringComparison.InvariantCultureIgnoreCase))
-			.OrderBy(x => x.PollId)
+		string currentValue = interaction.Data.Current.Value.ToString();
+		var polls = (context as CatCoreInteractionContext).Db.Polls
+			.Where(x => x.GuildId == context.Guild.Id)
+			.ToList()
+			.Where(x => x.Title.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
 			.ToList();
 
 		polls = polls.Count > 20
