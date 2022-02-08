@@ -8,7 +8,7 @@ title: Pronoun
     Table of contents
   </summary>
   {: .text-delta }
-1. TOC
+- TOC
 {:toc}
 </details>
 
@@ -25,8 +25,6 @@ Slash Command
 ```xml
 /pronoun add <pronoun> 
 ```
-
-args: 
 
 | arg     | type    | use                                |
 |---------|---------|------------------------------------|
