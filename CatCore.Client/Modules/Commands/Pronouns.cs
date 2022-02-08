@@ -106,7 +106,7 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 		Pronoun pronoun)
 	{
 		await RespondAsync($"Have you seen {Context.User.Mention}'s latest project? " +
-			$"**{pronoun.Subject}** made a really pretty necklace that looks like **{pronoun.PossessiveAdjective}**" + 
+			$"**{pronoun.Subject}** made a really pretty necklace that looks like **{pronoun.PossessiveAdjective}** " + 
 			$"cats hugging. I wish I spent more time on projects like **{pronoun.Object}**.", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
 	}
