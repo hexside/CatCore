@@ -21,7 +21,6 @@ CatCore's mail system is designed to distrubute important messages (like new upd
 Mail groups are used to determines what notifications you will get (for example if you want to know about every new feature the moment it drops you could subscribe to the `patchnotes` feed).
 
 ## Mail Inbox
-
 {: .d-inline-block }
 
 Slash Command
@@ -39,7 +38,6 @@ Slash Command
 This command lets you search the contents of your inbox and select a specific message to view. Viewing a message for the first time will mark it as read so it's easier to find mesages that need your attention. 
 
 ## Mail Join
-
 {: .d-inline-block }
 
 Slash Command
@@ -56,7 +54,6 @@ Slash Command
 This command will subscribe you to a message group, delivering all of it's new messages to your inbox. You will not older messages from the group.
 
 ## Mail Leave
-
 {: .d-inline-block }
 
 Slash Command
