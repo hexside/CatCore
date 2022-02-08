@@ -25,6 +25,7 @@ Slash Command
 ```xml
 /pronoun add <pronoun> 
 ```
+
 | arg     | type    | use                                |
 |---------|---------|------------------------------------|
 | pronoun | Pronoun | The pronoun to add to your profile |
@@ -42,6 +43,7 @@ Slash Command
 ```xml
 /pronoun get <user> 
 ```
+
 | arg  | type | use                           |
 |------|------|-------------------------------|
 | user | User | The user's pronoun to look up |
@@ -59,6 +61,7 @@ Temporary
 ```xml
 /pronoun new <subject> <object> <possessive-adj> <possessive-pnoun> <reflexive>
 ```
+
 | arg               | type   | use                                                                 |
 |-------------------|--------|---------------------------------------------------------------------|
 | subject           | String | The subject pronoun (**they** went to the park)                     |
@@ -78,6 +81,7 @@ Slash Command
 ```xml
 /pronoun remove <pronoun> 
 ```
+
 | arg     | type    | use                                     |
 |---------|---------|-----------------------------------------|
 | pronoun | pronoun | The pronoun to remove from your profile |
@@ -93,6 +97,7 @@ Slash Command
 ```xml
 /pronoun try <user> 
 ```
+
 | arg  | type | use                           |
 |------|------|-------------------------------|
 | user | User | The user's pronoun to look up |
