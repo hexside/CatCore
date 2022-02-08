@@ -26,6 +26,8 @@ Slash Command
 /pronoun add <pronoun> 
 ```
 
+args: 
+
 | arg     | type    | use                                |
 |---------|---------|------------------------------------|
 | pronoun | Pronoun | The pronoun to add to your profile |
