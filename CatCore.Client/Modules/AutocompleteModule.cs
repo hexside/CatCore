@@ -34,9 +34,7 @@ internal class PollAutocompleteProvider : AutocompleteHandler
 		IAutocompleteInteraction interaction, IParameterInfo parameter, IServiceProvider services)
 	{
 		string currentValue = interaction.Data.Current.Value.ToString();
-		var polls = (context as CatCoreInteractionContext).Db.Polls
-			.Where(x => x.GuildId == context.Guild.Id)
-			.ToList()
+		var polls = (context as CatCoreInteractionContext).DbGuild.Polls
 			.Where(x => x.Title.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
 			.ToList();
 

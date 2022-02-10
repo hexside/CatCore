@@ -11,6 +11,7 @@ public class CatCoreContext : DbContext
 	public DbSet<Message> Messages { get; set; }
 	public DbSet<UserMessage> UserMessages { get; set; }
 	public DbSet<MessageGroup> MessageGroups { get; set; } 
+	public DbSet<Guild> Guilds { get; set; } 
 
 	public CatCoreContext(string dbPath = "CatCore.db")
 	{

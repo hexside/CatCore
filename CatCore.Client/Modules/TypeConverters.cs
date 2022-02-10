@@ -9,7 +9,7 @@ public class PollTypeConverter<T> : TypeConverter<T> where T : Poll
 	public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context,
 		IApplicationCommandInteractionDataOption option, IServiceProvider services)
 	{
-		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var catCoreContext = (CatCoreInteractionContext)context;
 		string value;
 
 		if (option.Value is Optional<object> optional)
@@ -19,7 +19,8 @@ public class PollTypeConverter<T> : TypeConverter<T> where T : Poll
 
 		try
 		{
-			var converted = await db.Polls.FirstAsync(x => x.PollId == int.Parse(value));
+			int iValue = int.Parse(value);
+			var converted = catCoreContext.DbGuild.Polls.First(x => x.PollId == iValue);
 			return TypeConverterResult.FromSuccess(converted);
 		}
 		catch (Exception ex)

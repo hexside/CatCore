@@ -1,5 +1,4 @@
 ﻿global using Discord;
-global using Discord.Net;
 global using Discord.Interactions;
 global using Discord.WebSocket;
 global using CatCore.Utils;
@@ -11,15 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Client;
+namespace CatCore.Client;
 
 internal class Program
 {
-	private static bool _firstReady = true;
 	private static Logger _logger;
-	private static readonly ClientSettings _settings = new("clientSettings.json");
 
 	private static ServiceProvider _configureServices() => new ServiceCollection()
+		.AddSingleton(new ClientSettings("clientSettings.json"))
 		.AddDbContext<CatCoreContext>()
 		.AddSingleton(new DiscordSocketClient(new()
 		{
@@ -33,7 +31,7 @@ internal class Program
 				DefaultRunMode = RunMode.Async
 			}))
 		.AddSingleton<CommandHandler>(x => new(x.GetRequiredService<DiscordSocketClient>(),
-			x.GetRequiredService<InteractionService>(), x))
+			x.GetRequiredService<InteractionService>(), x, x.GetRequiredService<ClientSettings>()))
 		.AddSingleton(JsonSerializer.Deserialize<List<ToneTag>>(File.ReadAllText("tags.json")))
 		.BuildServiceProvider();
 
@@ -43,7 +41,7 @@ internal class Program
 		var client = services.GetRequiredService<DiscordSocketClient>();
 		var commands = services.GetRequiredService<InteractionService>();
 		var handler = services.GetRequiredService<CommandHandler>();
-
+		var settings = services.GetRequiredService<ClientSettings>();
 		client.Log += x =>
 		{
 			_logger.Log(x);
@@ -60,7 +58,7 @@ internal class Program
 			return Task.CompletedTask;
 		};
 
-		_logger = new("Client", _settings.WebhookUrl, LogSeverity.Debug);
+		_logger = new("Client", settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
 		_logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
 
@@ -70,26 +68,7 @@ internal class Program
 		_logger.LogInfo($"Loaded {count} commands.");
 		await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
 
-		client.Ready += async () =>
-		{
-			if (_firstReady)
-			{
-				_firstReady = false;
-				_logger.LogVerbose("Starting interaction service.");
-				try
-				{
-					if (_settings.DebugMode) await commands.RegisterCommandsToGuildAsync(_settings.DebugGuildId, true);
-					else await commands.RegisterCommandsGloballyAsync(true);
-				}
-				catch (HttpException ex)
-				{
-					_logger.LogCritical($"Failed to regester commands because {ex}, " + 
-						$"(see {JsonSerializer.Serialize(ex.Errors)})");
-				}
-			}
-		};
-
-		await client.LoginAsync(TokenType.Bot, _settings.Token);
+		await client.LoginAsync(TokenType.Bot, settings.Token);
 		await client.StartAsync();
 
 		await Task.Delay(-1);

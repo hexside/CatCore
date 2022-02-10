@@ -2,6 +2,7 @@
 using CatCore.Client.TypeConverters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Discord.Rest;
 
 namespace CatCore.Client.Commands;
 
@@ -11,27 +12,35 @@ internal class CommandHandler
 	private readonly InteractionService _interactionService;
 	private readonly IServiceProvider _services;
 	private readonly Logger _logger;
+	private readonly bool _debugMode;
+	private readonly ulong _debugGuild;
+	private bool _firstClientReady = true;
 
 	public event Func<LogMessage, Task> Log;
 
-	public CommandHandler(DiscordSocketClient client, InteractionService interaction, IServiceProvider service)
+	public CommandHandler(DiscordSocketClient client, InteractionService interaction, IServiceProvider service, 
+		ClientSettings settings)
 	{
 		_logger = new("Command Handler", LogSeverity.Debug);
 		_logger.LogFired += x => Log.Invoke(x);
 		_client = client;
 		_interactionService = interaction;
 		_services = service;
+		_debugMode = settings.DebugMode;
+		_debugGuild = settings.DebugGuildId;
+		client.Ready += ClientReady;
 	}
 
 	public async Task InitializeAsync()
 	{
 		try
-		{
+		{	
 			_logger.LogVerbose("Adding TypeConverters");
 			_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<UserMessage>(typeof(UserMessageTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<MessageGroup>(typeof(MessageGroupTypeConverter<>));
+			
 			await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
 
 			_client.InteractionCreated += HandleInteraction;
@@ -127,4 +136,33 @@ internal class CommandHandler
 		var context = new CatCoreInteractionContext(_client, interaction, db);
 		await _interactionService.ExecuteCommandAsync(context, _services);
 	}
+	
+	private async Task ClientReady()
+	{
+		// make the function only run once
+		if (!_firstClientReady) return;
+		_firstClientReady = false;
+		
+		RestGuild guild = await _client.Rest.GetGuildAsync(_debugGuild);
+		if (!_debugMode)
+		{
+			// only regester sensitive commands to the debugging guild.
+			var safeCommands = _interactionService.Modules
+				.Where(x => !x.Attributes
+					.Any(y => y is DebugModeCommandAttribute))
+				.ToArray();
+			var badCommands = _interactionService.Modules
+				.Where(x => !safeCommands.Contains(x))
+				.ToArray();
+			await _interactionService.AddModulesGloballyAsync(true, safeCommands);
+			await _interactionService.AddModulesToGuildAsync(guild, true, badCommands);
+		}
+		else await _interactionService.RegisterCommandsToGuildAsync(guild.Id);
+	}
+}
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+public class DebugModeCommandAttribute : Attribute
+{
+	
 }

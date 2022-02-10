@@ -3,6 +3,7 @@ using CatCore.Client.Autocomplete;
 namespace CatCore.Client.Commands;
 
 [Group("dev", "dev commands.")]
+[DebugModeCommand]
 public partial class DevCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
 	[SlashCommand("say", "Echo a message.")]

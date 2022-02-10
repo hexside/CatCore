@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Client
+namespace CatCore.Client
 {
 	internal class ClientSettings
 	{
