@@ -13,7 +13,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 	[RequireBotPermission(GuildPermission.ManageRoles)]
 	public class PollRoleCommands : InteractionModuleBase<CatCoreInteractionContext>
 	{
-		[SlashCommand("add-role", "Adds a role to a poll.")]
+		[SlashCommand("add", "Adds a role to a poll.")]
 		public async Task Add
 		(
 			[Summary("poll", "The poll to add the role to.")]
@@ -57,7 +57,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 			PollRole newRole = new()
 			{
-				Description = description,
+				Description = description.Trim(),
 				RoleId = role.Id,
 				Poll = poll
 			};
@@ -69,8 +69,8 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			await RespondAsync($"Added {role.Mention} to the poll.", ephemeral: true, allowedMentions: AllowedMentions.None);
 		}
 
-		[SlashCommand("remove-role", "Deletes a role from a poll.")]
-		public async Task DeleteRole
+		[SlashCommand("remove", "Removes a role from a poll.")]
+		public async Task Remove
 		(
 			[Summary(null, "The poll to delete the roll from.")]
 			[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll,
@@ -109,10 +109,10 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 		Poll poll = new()
 		{
-			Title = modal.Name,
-			Description = modal.Description,
-			Footer = modal.Footer,
-			ImageUrl = modal.ImageUrl,
+			Title = modal.Name.Trim(),
+			Description = modal.Description.Trim(),
+			Footer = modal.Footer.Trim(),
+			ImageUrl = modal.ImageUrl?.Trim(),
 			Min = min,
 			Max = max,
 		};
@@ -161,14 +161,14 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 		var mb = new ModalBuilder()
 			.WithTitle("Update Poll")
-			.WithCustomId($"poll.{poll.PollId}.update:{min},{max};")
+			.WithCustomId($"poll.{poll.PollId}.update:{poll.Min},{poll.Max};")
 			.AddTextInput("name", "name", TextInputStyle.Short, "Enter your poll's name", 1, 256, true, poll.Title)
 			.AddTextInput("description", "description", TextInputStyle.Paragraph, "Enter your poll's description",
 				1, 256, true, poll.Description)
-			.AddTextInput("footer", "footer", TextInputStyle.Short, "Enter your poll's footer", 1, 1024, true,
+			.AddTextInput("footer", "footer", TextInputStyle.Paragraph, "Enter your poll's footer", 1, 1024, true,
 				poll.Footer)
 			.AddTextInput("image url", "image_url", TextInputStyle.Short, "Enter your poll's image url", 1, 1024,
-				true, poll.ImageUrl);
+				false, poll.ImageUrl.Length > 1 ? poll.ImageUrl : null);
 
 		await RespondWithModalAsync(mb.Build());
 	}
@@ -180,10 +180,10 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		Poll poll = Context.DbGuild.Polls.First(x => x.PollId == pollId);
 		poll.Min = int.Parse(minStr);
 		poll.Max = int.Parse(maxStr);
-		poll.Title = modal.Name;
-		poll.Description = modal.Description;
-		poll.Footer = modal.Footer;
-		poll.ImageUrl = modal.ImageUrl;
+		poll.Title = modal.Name.Trim();
+		poll.Description = modal.Description.Trim();
+		poll.Footer = modal.Footer.Trim();
+		poll.ImageUrl = modal.ImageUrl.Trim();
 		Context.Db.Guilds.Update(Context.DbGuild);
 		await Context.Db.SaveChangesAsync();
 	}

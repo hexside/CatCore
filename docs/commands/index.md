@@ -36,5 +36,9 @@ Some commands have options which may choose to provide. These options allow for 
 
 ## Context Menu Commands
 Context menu commands are displayed on the right click menu of users and messages in the Web and Desktop versions of Discord. In order to use a context menu command right click a message or user, select the apps sub-menu, and click a command. 
-
 ![An example context command](images/tone_tag_resolve.png)
+
+## Modal Commands
+Modal commands are [slash](#slash-commands) or [context menu](#context-menu-commands) commands that respond with a Modal, these commands will have a modal in their argument table, as well as the ``modal`` tag. Clicking the modal option's type will provide more information about the modal itself.
+
+![An example modal](images/poll_add_modal.png)
