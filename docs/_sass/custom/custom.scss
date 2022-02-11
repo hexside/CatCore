@@ -5,6 +5,9 @@
 .main-content h5 + p,
 .main-content h6 + p {
   margin-top: revert;
+  margin-left: 0.2em !important;
+  margin-right: 0.2em !important;
+  margin-bottom: 1.5em !important;
 }
 
 .label-pink {
@@ -12,13 +15,7 @@
   color: black;
 }
 
-a.label-pink {
+a>.label {
   color: black !important;
   text-decoration: none !important;
-}
-
-.label {
-  margin-left: 0.2em !important;
-  margin-right: 0.2em !important;
-  margin-bottom: 1.5em !important;
 }
