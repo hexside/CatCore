@@ -1,21 +1,8 @@
-.main-content h1 + p,
-.main-content h2 + p,
-.main-content h3 + p,
-.main-content h4 + p,
-.main-content h5 + p,
-.main-content h6 + p {
-  margin-top: revert;
+.main-content h1+p, .main-content h2+p, .main-content h3+p, .main-content h4+p, .main-content h5+p, .main-content h6+p {
+  margin-top:revert
 }
 
 .label-pink {
   background-color: rgb(247, 106, 207);
-}
-
-a {
-  text-decoration: none;
-  color:black;  
-}
-
-a:hover{
-    text-decoration: underline;
+  color: black;
 }
