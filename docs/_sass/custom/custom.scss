@@ -1,5 +1,10 @@
-.main-content h1+p, .main-content h2+p, .main-content h3+p, .main-content h4+p, .main-content h5+p, .main-content h6+p {
-  margin-top:revert
+.main-content h1 + p,
+.main-content h2 + p,
+.main-content h3 + p,
+.main-content h4 + p,
+.main-content h5 + p,
+.main-content h6 + p {
+  margin-top: revert;
 }
 
 .label-pink {
@@ -8,5 +13,12 @@
 }
 
 a.label-pink {
-  color: black;
+  color: black !important;
+  text-decoration: none !important;
+}
+
+.label {
+  margin-left: 0.2em !important;
+  margin-right: 0.2em !important;
+  margin-bottom: 1.5em !important;
 }
