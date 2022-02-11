@@ -173,7 +173,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		await RespondWithModalAsync(mb.Build());
 	}
 	
-	[ModalInteraction("poll.*.update:*,*;")]
+	[ModalInteraction("poll.*.update:*,*;", true)]
 	public async Task UpdatePollModal(string pollIdStr, string minStr, string maxStr, PollModal modal)
 	{
 		int pollId = int.Parse(pollIdStr);
@@ -186,6 +186,8 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		poll.ImageUrl = modal.ImageUrl.Trim();
 		Context.Db.Guilds.Update(Context.DbGuild);
 		await Context.Db.SaveChangesAsync();
+
+		await RespondAsync("Updated the poll", ephemeral: true);
 	}
 
 	[ComponentInteraction("poll.*.result", true)]
