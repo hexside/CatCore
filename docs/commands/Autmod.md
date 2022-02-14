@@ -2,6 +2,7 @@
 layout: default
 title: Automod
 parent: Commands
+has_children: true
 ---
 
 # Automod
