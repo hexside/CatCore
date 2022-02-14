@@ -16,11 +16,14 @@ public class CatCoreInteractionContext : SocketInteractionContext
 				.ThenInclude(um => um.Message)
 			.Include(u => u.MessageGroups)
 				.ThenInclude(mg => mg.VisiableTo)
-			.FirstOrDefault(x => x.DiscordID == User.Id);
+			.FirstOrDefault(u => u.DiscordID == User.Id);
+			
 		DbGuild = db.Guilds
 			.Include(g => g.Polls)
 				.ThenInclude(p => p.Roles)
-			.FirstOrDefault(x => x.DiscordId == Guild.Id);
+			// .Include(g => g.RegexActions)
+			// 	.ThenInclude(ra => ra.Conditions)
+			.FirstOrDefault(g => g.DiscordId == Guild.Id);
 
 		if (DbUser is null)
 		{

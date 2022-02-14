@@ -3,6 +3,7 @@ global using Discord.Interactions;
 global using Discord.WebSocket;
 global using CatCore.Utils;
 global using CatCore.Data;
+global using Discord.Rest;
 global using Microsoft.EntityFrameworkCore;
 global using CatCore.Client.Commands;
 
@@ -22,7 +23,7 @@ internal class Program
 		.AddSingleton(new DiscordSocketClient(new()
 		{
 			LogLevel = LogSeverity.Debug,
-			GatewayIntents = GatewayIntents.Guilds
+			GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages
 		}))
 		.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(),
 			new()
@@ -62,8 +63,8 @@ internal class Program
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
 		_logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
 
+		client.MessageReceived += async x => await AutomodCheck(x, client);
 		await handler.InitializeAsync();
-
 		int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
 		_logger.LogInfo($"Loaded {count} commands.");
 		await client.SetGameAsync($"{count} commands.", type: ActivityType.Listening);
@@ -72,5 +73,22 @@ internal class Program
 		await client.StartAsync();
 
 		await Task.Delay(-1);
+	}
+	
+	private static async Task AutomodCheck(IMessage message, IDiscordClient client)
+	{
+		if (message.Author is not IGuildUser user) return;
+		if (message.Author.Id == client.CurrentUser.Id) return;
+
+		var guild = await new CatCoreContext()
+			.Guilds
+			// .Include(x => x.RegexActions)
+			// 	.ThenInclude(x => x.Conditions)
+			.Include(x => x.Polls)
+				.ThenInclude(x => x.Roles)
+			.Include(x => x.Polls)
+			.FirstAsync(x => x.DiscordId == user.GuildId);
+
+		guild.RegexActions.OnEach(async x => await x.ExecuteAsync(message));
 	}
 }

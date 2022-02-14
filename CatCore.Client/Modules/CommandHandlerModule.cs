@@ -40,7 +40,8 @@ internal class CommandHandler
 			_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<UserMessage>(typeof(UserMessageTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<MessageGroup>(typeof(MessageGroupTypeConverter<>));
-			
+			_interactionService.AddGenericTypeConverter<RegexAction>(typeof(RegexActionTypeConverter<>));
+
 			await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
 
 			_client.InteractionCreated += HandleInteraction;

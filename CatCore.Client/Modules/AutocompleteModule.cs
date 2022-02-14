@@ -116,6 +116,22 @@ internal class MessageGroupAutocompleteProvider : AutocompleteHandler
 	}
 }
 
+internal class RegexActionAutocompleteProvider : AutocompleteHandler
+{
+	public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
+		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+	{
+		var dbGuild = (context as CatCoreInteractionContext).DbGuild;
+		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
+
+		var regexActions = dbGuild.RegexActions
+			.Where(x => x.Valid)
+			.Where(x => x.ActionName.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
+			.Select(x => new AutocompleteResult(x.ActionName, x.RegexActionId));
+
+		return Task.FromResult(AutocompletionResult.FromSuccess(regexActions));
+	}
+}
 
 /// <summary>
 /// This attribute makes supported autocomplete providers

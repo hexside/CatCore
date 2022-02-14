@@ -190,7 +190,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		await RespondAsync("Updated the poll", ephemeral: true);
 	}
 
-	[ComponentInteraction("poll.*.result", true)]
+	[ComponentInteraction("poll.*.result")]
 	public async Task AddPollRole(string id, string[] values)
 	{
 		await (Context.Interaction as SocketMessageComponent).DeferLoadingAsync(ephemeral: true);

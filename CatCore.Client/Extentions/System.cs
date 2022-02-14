@@ -18,5 +18,14 @@ namespace System
 			original = original.Insert(place, value);
 			return original;
 		}
+
+		public static int GetInt(this bool inpt) => inpt ? 1 : 0;
+
+		public static bool GetBool(this int inpt) => inpt switch
+		{
+			1 => true,
+			0 => false,
+			_ => throw new ArgumentOutOfRangeException(nameof(inpt), inpt, "Value most be 0 or 1")
+		};
 	}
 }

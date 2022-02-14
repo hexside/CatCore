@@ -112,3 +112,30 @@ public class MessageGroupTypeConverter<T> : TypeConverter<T> where T : MessageGr
 		}
 	}
 }
+
+public class RegexActionTypeConverter<T> : TypeConverter<T> where T : RegexAction
+{
+	public override ApplicationCommandOptionType GetDiscordType()
+		=> ApplicationCommandOptionType.String;
+
+	public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+	{
+		string value;
+		if (option.Value is Optional<object> optional)
+			value = optional.IsSpecified ? (string)optional.Value : "";
+		else
+			value = (string)option.Value;
+		
+		try
+		{
+			var intValue = int.Parse(value);
+			var converted = ((CatCoreInteractionContext)context).DbGuild.RegexActions
+				.First(x => x.RegexActionId == intValue);
+			return Task.FromResult(TypeConverterResult.FromSuccess(converted));
+		}
+		catch (Exception ex)
+		{
+			return Task.FromResult(TypeConverterResult.FromError(ex));
+		}
+	}
+}
