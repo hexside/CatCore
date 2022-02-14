@@ -1,7 +1,7 @@
 ---
 layout: default
-title: Role
-parent: Poll
+title: Filter
+parent: Automod
 grand_parent: Commands
 ---
 
