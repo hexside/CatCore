@@ -21,7 +21,7 @@ A poll is a menu created by CatCore that lets your members assign roles to thems
 {: .d-inline-block }
 Slash Command
 {: .label .label-green }
-[Modal](modals.md#creating-and-updating-polls)
+Modal
 {: .label .label-pink }
 
 ```xml

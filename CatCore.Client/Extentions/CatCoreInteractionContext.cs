@@ -21,8 +21,7 @@ public class CatCoreInteractionContext : SocketInteractionContext
 		DbGuild = db.Guilds
 			.Include(g => g.Polls)
 				.ThenInclude(p => p.Roles)
-			// .Include(g => g.RegexActions)
-			// 	.ThenInclude(ra => ra.Conditions)
+			.Include(g => g.RegexActions)
 			.FirstOrDefault(g => g.DiscordId == Guild.Id);
 
 		if (DbUser is null)

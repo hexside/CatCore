@@ -29,7 +29,7 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 				await RespondAsync("A valid message flag channel is required to run this command.", ephemeral: true);
 				return;
 			}
-			
+
 			RegexAction action = new()
 			{
 				CleanMessage = cleanMessage,
@@ -79,6 +79,9 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 		[ModalInteraction("automod.filter.*.setRegex:*;", true)]
 		[RequireUserPermission(GuildPermission.ManageMessages)]
+		public async Task AddRegexFilterModal(string idStr, string escapeRegexStr, AutomodRegexInputModal modal)
+			=> await AddFilterModal(idStr, escapeRegexStr, new() { Name = modal.Name, Filter = modal.Filter });
+		[RequireUserPermission(GuildPermission.ManageMessages)]
 		public async Task AddFilterModal(string idStr, string escapeRegexStr, AutomodInputModal modal)
 		{
 			if (Context.DbGuild.MessageFlagChannelId is 0)
@@ -87,14 +90,14 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 				return;
 			}
 
-			int id = int.Parse(idStr);
-			var action = Context.DbGuild.RegexActions.First(x => x.RegexActionId == id);
-			bool useRegex = int.Parse(escapeRegexStr).GetBool();
+			int id = int.Parse(idStr);var action = Context.DbGuild.RegexActions.First(x => x.RegexActionId == id);
+			
+			bool escapeRegex = int.Parse(escapeRegexStr).GetBool();
 			bool firstUse = !action.Valid;
 
-			action.RegexString = useRegex
-				? modal.Filter
-				: Regex.Escape(modal.Filter);
+			action.RegexString = escapeRegex
+				? Regex.Escape(modal.Filter)
+				: modal.Filter;
 			action.Valid = true;
 			action.ActionName = modal.Name;
 
@@ -111,8 +114,8 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 		[RequireUserPermission(GuildPermission.ManageMessages)]
 		public async Task UpdateFilter()
 			=> await RespondWithModalAsync<AutomodTestModal>("automod.filter.test");
-			
-		[ModalInteraction("automod.filter.test")]
+
+		[ModalInteraction("automod.filter.test", true)]
 		public async Task AutomodFilterTest(AutomodTestModal modal)
 		{
 			List<Embed> embeds = new();
@@ -122,15 +125,28 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 					.WithTitle("Action Triggered")
 					.WithDescription($"{x.ActionName} : `{x.RegexString}`")
 					.Build()));
-					
-			await RespondAsync($"**{embeds.Count}** filters triggered", embeds:embeds.ToArray());
+
+			await RespondAsync($"**{embeds.Count}** filters triggered", embeds: embeds.ToArray(), ephemeral:true);
+		}
+
+		[SlashCommand("remove", "remove an automod filter.")]
+		public async Task RemoveAutomodFilter
+		(
+			[Autocomplete(typeof(RegexActionAutocompleteProvider))]
+			[Summary(null, "The filter to remove")] RegexAction filter
+		)
+		{
+			Context.DbGuild.RegexActions.Remove(filter);
+			await Context.Db.SaveChangesAsync();
+
+			await RespondAsync("Deleted the filter.", ephemeral: true);
 		}
 	}
-	
+
 	[SlashCommand("notifications", "Change the notification channel.")]
 	public async Task AutomodNotificationChannel
 	(
-		[Summary("channel", "What channel should automod notifications be sent to?")]ITextChannel channel
+		[Summary("channel", "What channel should automod notifications be sent to?")] ITextChannel channel
 	)
 	{
 		Context.DbGuild.MessageFlagChannelId = channel.Id;

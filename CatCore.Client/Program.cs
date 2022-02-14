@@ -62,7 +62,7 @@ internal class Program
 		_logger = new("Client", settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
 		_logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
-
+		
 		client.MessageReceived += async x => await AutomodCheck(x, client);
 		await handler.InitializeAsync();
 		int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;

@@ -127,7 +127,7 @@ internal class RegexActionAutocompleteProvider : AutocompleteHandler
 		var regexActions = dbGuild.RegexActions
 			.Where(x => x.Valid)
 			.Where(x => x.ActionName.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
-			.Select(x => new AutocompleteResult(x.ActionName, x.RegexActionId));
+			.Select(x => new AutocompleteResult(x.ActionName, x.RegexActionId.ToString()));
 
 		return Task.FromResult(AutocompletionResult.FromSuccess(regexActions));
 	}

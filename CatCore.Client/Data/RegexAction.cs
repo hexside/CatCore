@@ -62,6 +62,7 @@ public class RegexAction
 	{
 		if (CleanMessage) content = Format.StripMarkDown(content).Normalize();
 		if (RemoveWhitespace) content = Regex.Replace(content, @"\s+", "");
+		if (RegexString is null) return false;
 
 		return Regex.IsMatch(content, RegexString, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(10));
 	}
