@@ -25,6 +25,7 @@ public class PollTypeConverter<T> : TypeConverter<T> where T : Poll
 		}
 		catch (Exception ex)
 		{
+			await context.Interaction.RespondAsync("Oops, we couldn't load that poll, make sure you picked something from the autocomplete menu.", ephemeral: true);
 			return TypeConverterResult.FromError(ex);
 		}
 	}
@@ -53,6 +54,7 @@ public class PronounTypeConverter<T> : TypeConverter<T> where T : Pronoun
 		}
 		catch (Exception ex)
 		{
+			await context.Interaction.RespondAsync("Oops, that pronoun isn't in the database, run `/pronoun new` to add it.", ephemeral:true);
 			return TypeConverterResult.FromError(ex);
 		}
 	}
@@ -63,7 +65,7 @@ public class UserMessageTypeConverter<T> : TypeConverter<T> where T : UserMessag
 	public override ApplicationCommandOptionType GetDiscordType()
 		=> ApplicationCommandOptionType.String;
 
-	public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+	public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
 	{
 		string value;
 		if (option.Value is Optional<object> optional)
@@ -76,11 +78,12 @@ public class UserMessageTypeConverter<T> : TypeConverter<T> where T : UserMessag
 			int i = int.Parse(value);
 			var converted = ((CatCoreInteractionContext)context).DbUser.Messages
 				.First(x => x.UserMessageId == i);
-			return Task.FromResult(TypeConverterResult.FromSuccess(converted));
+			return TypeConverterResult.FromSuccess(converted);
 		}
 		catch (Exception ex)
 		{
-			return Task.FromResult(TypeConverterResult.FromError(ex));
+			await context.Interaction.RespondAsync("Something went wrong loading that message.", ephemeral: true);
+			return TypeConverterResult.FromError(ex);
 		}
 	}
 }
@@ -118,7 +121,7 @@ public class RegexActionTypeConverter<T> : TypeConverter<T> where T : RegexActio
 	public override ApplicationCommandOptionType GetDiscordType()
 		=> ApplicationCommandOptionType.String;
 
-	public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+	public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
 	{
 		string value;
 		if (option.Value is Optional<object> optional)
@@ -131,11 +134,12 @@ public class RegexActionTypeConverter<T> : TypeConverter<T> where T : RegexActio
 			var intValue = int.Parse(value);
 			var converted = ((CatCoreInteractionContext)context).DbGuild.RegexActions
 				.First(x => x.RegexActionId == intValue);
-			return Task.FromResult(TypeConverterResult.FromSuccess(converted));
+			return TypeConverterResult.FromSuccess(converted);
 		}
 		catch (Exception ex)
 		{
-			return Task.FromResult(TypeConverterResult.FromError(ex));
+			await context.Interaction.RespondAsync("We couldn't load that automod action, make sure you picked something from the autocomplete menu.", ephemeral: true);
+			return TypeConverterResult.FromError(ex);
 		}
 	}
 }
