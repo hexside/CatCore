@@ -7,6 +7,7 @@
 		public ulong DiscordID { get; set; }
 		public List<UserMessage> Messages { get; set; } = new();
 		public List<MessageGroup> MessageGroups { get; set; } = new();
+		public bool AnyPronouns { get; set; } = false;
 
 		public List<Pronoun> Pronouns { get; set; } = new();
 

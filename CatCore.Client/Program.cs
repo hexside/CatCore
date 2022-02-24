@@ -88,11 +88,7 @@ internal class Program
 
 		var guild = await new CatCoreContext()
 			.Guilds
-			// .Include(x => x.RegexActions)
-			// 	.ThenInclude(x => x.Conditions)
-			.Include(x => x.Polls)
-				.ThenInclude(x => x.Roles)
-			.Include(x => x.Polls)
+			.Include(x => x.RegexActions)
 			.FirstAsync(x => x.DiscordId == user.GuildId);
 
 		guild.RegexActions.OnEach(async x => await x.ExecuteAsync(message));

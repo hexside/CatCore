@@ -15,7 +15,7 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 		User user = await Context.Db.Users.FirstAsync(x => x.DiscordID == Context.User.Id);
 
 		List<Pronoun> pronouns = user.Pronouns;
-		
+
 		if (pronouns.Any(x => x.PronounId == pronoun.PronounId))
 		{
 			await RespondAsync("You already have that pronoun", ephemeral: true);
@@ -25,7 +25,7 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 		user.Pronouns.Add(pronoun);
 		Context.Db.Users.Update(user);
 		await Context.Db.SaveChangesAsync();
-		
+
 		await RespondAsync($"added **{pronoun:s/o/p}** to your profile", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
 	}
@@ -35,7 +35,7 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 	[Summary("user", "The user to get pronouns from.")]
 	SocketUser user)
 		=> await Pronouns(user);
-	
+
 	//TODO: Convert to modal.
 	[SlashCommand("new", "Creates a new pronoun.")]
 	public async Task New
@@ -71,30 +71,40 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 	[UserCommand("Pronouns")]
 	public async Task Pronouns(SocketUser user)
 	{
-		List<Pronoun> pronouns = Context.DbUser.Pronouns;
+		User? dbUser = await Context.Db.Users.FirstOrDefaultAsync(x => x.DiscordID == user.Id);
+		List<Pronoun> pronouns = dbUser?.Pronouns ?? new();
 
-		string responce = pronouns.Count switch
+		if (dbUser?.AnyPronouns ?? false)
 		{
-			0 => $"{user.Mention} did not specify their pronouns, have them run **`/pronoun add`** to set them",
-			_ => $@"{user.Mention}'s pronouns are {string.Concat(pronouns.Select(x => $"{x.ToString("**s**, **o**")}, "))
-					[..^2].ReplaceLast(",", " and")}"
-		};
+			await RespondAsync("This user uses any pronouns :3");
+			return;
+		}
 
-		await Context.Interaction.RespondAsync(responce, ephemeral: true, allowedMentions: AllowedMentions.None);
+		if (pronouns is null || pronouns.Count < 1)
+		{
+			await RespondAsync($"{user.Mention} did not specify their pronouns, have them run **`/pronoun add`** to set them",
+				ephemeral: true, allowedMentions: AllowedMentions.None);
+			return;
+		}
+		string pronounsStr = string.Concat(pronouns.Select(x => $"{x.ToString("**s**, **o**")}, "))
+			[..^2].ReplaceLast(",", " and");
+
+		await RespondAsync($@"{user.Mention}'s pronouns are {pronounsStr}", ephemeral: true,
+			allowedMentions: AllowedMentions.None);
 	}
 
 	[SlashCommand("remove", "Remove a pronoun to your profile.")]
 	public async Task Remove
 	(
 		[Autocomplete(typeof(PronounAutocompleteProvider))]
-		[AutocompleteFromUserAtribute] 
+		[AutocompleteFromUserAtribute]
 		[Summary("pronoun", "The pronoun to remove.")] Pronoun pronoun
 	)
 	{
 		Context.DbUser.Pronouns.Remove(pronoun);
 		Context.Db.Users.Update(Context.DbUser);
 		await Context.Db.SaveChangesAsync();
-		
+
 		await RespondAsync($"Removed {pronoun:**s**/**o**/**a**} from your profile.", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
 	}
@@ -106,8 +116,24 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 		Pronoun pronoun)
 	{
 		await RespondAsync($"Have you seen {Context.User.Mention}'s latest project? " +
-			$"**{pronoun.Subject}** made a really pretty necklace that looks like **{pronoun.PossessiveAdjective}** " + 
+			$"**{pronoun.Subject}** made a really pretty necklace that looks like **{pronoun.PossessiveAdjective}** " +
 			$"cats hugging. I wish I spent more time on projects like **{pronoun.Object}**.", ephemeral: true,
 			allowedMentions: AllowedMentions.None);
+	}
+
+	[SlashCommand("any", "Set your profile to use any pronoun.")]
+	public async Task AnyPronounsAsync
+	(
+		[Summary("enable", "Should your profile say you use any pronouns?")] bool? enable = null
+	)
+	{
+		if (enable is null)
+		{
+			await RespondAsync(Context.DbUser.AnyPronouns
+				? "You currently have any pronouns set"
+				: "You are using sets of pronouns.", ephemeral: true);
+			return;
+		}
+		else Context.DbUser.AnyPronouns = enable.Value;
 	}
 }
