@@ -10,6 +10,8 @@ global using CatCore.Client.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Text.Json;
+using Discord.Net;
+using System.Text.RegularExpressions;
 
 namespace CatCore.Client;
 
@@ -23,13 +25,13 @@ internal class Program
 		.AddSingleton(new DiscordSocketClient(new()
 		{
 			LogLevel = LogSeverity.Debug,
-			GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages
+			GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMessages,
 		}))
 		.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(),
 			new()
 			{
 				LogLevel = LogSeverity.Debug,
-				DefaultRunMode = RunMode.Async
+				DefaultRunMode = RunMode.Async,
 			}))
 		.AddSingleton<CommandHandler>(x => new(x.GetRequiredService<DiscordSocketClient>(),
 			x.GetRequiredService<InteractionService>(), x, x.GetRequiredService<ClientSettings>()))
@@ -43,6 +45,7 @@ internal class Program
 		var commands = services.GetRequiredService<InteractionService>();
 		var handler = services.GetRequiredService<CommandHandler>();
 		var settings = services.GetRequiredService<ClientSettings>();
+		var context = services.GetRequiredService<CatCoreContext>();
 		client.Log += x =>
 		{
 			_logger.Log(x);
@@ -62,7 +65,10 @@ internal class Program
 		_logger = new("Client", settings.WebhookUrl, LogSeverity.Debug);
 		_logger.LogFired += x => Task.Run(() => Console.WriteLine(x.ToFormattedString()));
 		_logger.LogInfo("CatCore " + Assembly.GetEntryAssembly().GetName().Version);
-		
+
+		_logger.LogInfo("CatCore", "Running db migration.");
+		await context.Database.MigrateAsync();
+
 		client.MessageReceived += async x => await AutomodCheck(x, client);
 		await handler.InitializeAsync();
 		int count = commands.SlashCommands.Count + commands.ComponentCommands.Count + commands.ContextCommands.Count;
@@ -74,7 +80,7 @@ internal class Program
 
 		await Task.Delay(-1);
 	}
-	
+
 	private static async Task AutomodCheck(IMessage message, IDiscordClient client)
 	{
 		if (message.Author is not IGuildUser user) return;

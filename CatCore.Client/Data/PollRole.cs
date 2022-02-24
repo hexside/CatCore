@@ -14,5 +14,6 @@ namespace CatCore.Data
 		public string Description { get; set; }
 		public int PollId { get; set; }
 		public Poll Poll { get; set; }
+		public string Emote { get; set; }
 	}
 }

@@ -19,7 +19,8 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			[Summary("poll", "The poll to add the role to.")]
 			[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll,
 			[Summary("role", "The role to add.")] IRole role,
-			[Summary("description", "The text shown under the role name.")] string description = null
+			[Summary("description", "The text shown under the role name.")] string description = null,
+			[Summary("emote", "The roles emoji.")] string emote = "<:amity:46264551874257006>"
 		)
 		{
 			var guildUser = (SocketGuildUser)Context.User;
@@ -38,20 +39,36 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			if (!isOwner && role.Position >= userPosition)
 			{
 				await RespondAsync($"You don't have permission to manage this role. Make sure it is below your highest" +
-					"role, and you have the **`Manage Roles`** permission");
+					"role, and you have the **`Manage Roles`** permission", ephemeral: true);
 				return;
 			}
 
 			if (role.Position >= botPosition)
 			{
 				await RespondAsync($"I don't have permission to manage this role. Make sure it is below my highest" +
-					"role, and I have the **`Manage Roles`** permission");
+					"role, and I have the **`Manage Roles`** permission", ephemeral: true);
+				return;
+			}
+
+			if (!Emote.TryParse(emote, out _))
+			{
+				await RespondAsync($"That emoji is invalid, make sure it is a non-animated emoji, " +
+					"contains no extra text, and matches the formatting data provided by " +
+					"[discord](https://discord.com/developers/docs/reference#message-formatting-formats]", ephemeral: true);
+			}
+
+			if (description?.Length >= 100)
+			{
+				await RespondAsync("The roles description must be less than 100 characters.");
 				return;
 			}
 
 			var roles = Context.Db.PollRoles.Where(x => x.PollId == poll.PollId);
 
-			if (roles.Any(x => x.RoleId == role.Id)) return;
+			if (roles.Any(x => x.RoleId == role.Id))
+			{
+				await RespondAsync("That role is already in the poll, run `/poll role update` to change it.", ephemeral: true);
+			}
 
 			description ??= role.Name;
 
@@ -59,7 +76,8 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			{
 				Description = description.Trim(),
 				RoleId = role.Id,
-				Poll = poll
+				Poll = poll,
+				Emote = emote
 			};
 
 			poll.Roles.Add(newRole);
@@ -90,6 +108,37 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			await RespondAsync("Removed the role!", ephemeral: true);
 		}
 
+		[SlashCommand("update", "Modifies a role in a poll")]
+		public async Task Update
+		(
+			[Autocomplete(typeof(PollAutocompleteProvider))]
+			[Summary(null, "The poll to update the role in.")] Poll poll,
+			[Summary(null, "The role to update")] SocketRole discordRole,
+			[Summary("emote", "The roles emoji.")] string? emote = null,
+			[Summary("description", "The text shown under the role name.")] string? description = null
+		)
+		{
+			PollRole role = poll.Roles.FirstOrDefault(x => x.RoleId == discordRole.Id);
+			if (role is null)
+			{
+				await RespondAsync("That role is not in the poll.", ephemeral: true);
+				return;
+			}
+
+			if (description.Length >= 100)
+			{
+				await RespondAsync("The roles description must be less than 100 characters.");
+				return;
+			}
+
+			role.Description = description ?? role.Description;
+			role.Emote = emote ?? role.Emote;
+
+			Context.Db.PollRoles.Update(role);
+			await Context.Db.SaveChangesAsync();
+
+			await RespondAsync("Updated the role!", ephemeral: true);
+		}
 	}
 
 	[SlashCommand("new", "Create a new poll.")]
@@ -100,7 +149,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		int? max = 0
 	)
 		=> await RespondWithModalAsync<PollModal>($"poll.create:{min},{max};");
-	
+
 	[ModalInteraction("poll.create:*,*;", true)]
 	public async Task NewModal(string minStr, string maxStr, PollModal modal)
 	{
@@ -120,10 +169,10 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		Context.DbGuild.Polls.Add(poll);
 		Context.Db.Guilds.Update(Context.DbGuild);
 		await Context.Db.SaveChangesAsync();
-		
+
 		await RespondAsync("Added the poll!", embed: poll.GetEmbed().Build(), ephemeral: true);
 	}
-	
+
 	[SlashCommand("delete", "Deletes a poll.")]
 	public async Task Delete
 	(
@@ -172,7 +221,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 		await RespondWithModalAsync(mb.Build());
 	}
-	
+
 	[ModalInteraction("poll.*.update:*,*;", true)]
 	public async Task UpdatePollModal(string pollIdStr, string minStr, string maxStr, PollModal modal)
 	{
@@ -190,7 +239,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		await RespondAsync("Updated the poll", ephemeral: true);
 	}
 
-	[ComponentInteraction("poll.*.result")]
+	[ComponentInteraction("poll.*.result", true)]
 	public async Task AddPollRole(string id, string[] values)
 	{
 		await (Context.Interaction as SocketMessageComponent).DeferLoadingAsync(ephemeral: true);
@@ -246,7 +295,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		var userRoles = (Context.User as IGuildUser).RoleIds;
 
 		roles.OnEach(x => sb.AddOption(guildRoles
-			.First(y => y.Id == x.RoleId).Name, x.RoleId.ToString(), x.Description,
+			.First(y => y.Id == x.RoleId).Name, x.RoleId.ToString(), x.Description, Emote.Parse(x.Emote),
 				isDefault: userRoles.Contains(x.RoleId)));
 
 
