@@ -64,6 +64,7 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 			{
 				await RespondAsync("A valid message flag channel is required to run this command.", ephemeral: true);
 				return;
+
 			}
 
 			action.Type = type ?? action.Type;
@@ -90,8 +91,8 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 				return;
 			}
 
-			int id = int.Parse(idStr);var action = Context.DbGuild.RegexActions.First(x => x.RegexActionId == id);
-			
+			int id = int.Parse(idStr); var action = Context.DbGuild.RegexActions.First(x => x.RegexActionId == id);
+
 			bool escapeRegex = int.Parse(escapeRegexStr).GetBool();
 			bool firstUse = !action.Valid;
 
@@ -126,7 +127,7 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 					.WithDescription($"{x.ActionName} : `{x.RegexString}`")
 					.Build()));
 
-			await RespondAsync($"**{embeds.Count}** filters triggered", embeds: embeds.ToArray(), ephemeral:true);
+			await RespondAsync($"**{embeds.Count}** filters triggered", embeds: embeds.ToArray(), ephemeral: true);
 		}
 
 		[SlashCommand("remove", "remove an automod filter.")]

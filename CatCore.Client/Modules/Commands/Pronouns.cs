@@ -1,3 +1,4 @@
+using CatCore.Client.Modals;
 using CatCore.Client.Autocomplete;
 
 namespace CatCore.Client.Commands;
@@ -36,24 +37,19 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 	SocketUser user)
 		=> await Pronouns(user);
 
-	//TODO: Convert to modal.
-	[SlashCommand("new", "Creates a new pronoun.")]
-	public async Task New
-	(
-		[Summary("subject", "They went to the park")] string subjective,
-		[Summary("object", "I went to the park with them.")] string objective,
-		[Summary("possessive-adj", "The park is near their house.")] string possessiveAdj,
-		[Summary("possessive-pnoun", "That park is theirs.")] string possessivePnoun,
-		[Summary("reflexive", "Someone went to the park by themself.")] string reflexive
-	)
+	[SlashCommand("new", "Create a new pronoun.")]
+	public async Task PronounNew() => await RespondWithModalAsync<PronounModal>("pronoun.new");
+
+	[ModalInteraction("pronoun.new", true)]
+	public async Task New(PronounModal modal)
 	{
 		Pronoun pronoun = new()
 		{
-			Subject = subjective,
-			Object = objective,
-			PossessiveAdjective = possessiveAdj,
-			PossessivePronoun = possessivePnoun,
-			Reflexive = reflexive
+			Subject = modal.Subjective,
+			Object = modal.Objective,
+			PossessiveAdjective = modal.PossessiveAdjective,
+			PossessivePronoun = modal.PossessivePronoun,
+			Reflexive = modal.Reflexive
 		};
 
 		if ((await Context.Db.Pronouns.ToListAsync()).Any(x => x.Matches(pronoun)))
@@ -76,13 +72,20 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 		if (dbUser?.AnyPronouns ?? false)
 		{
-			await RespondAsync("This user uses any pronouns :3");
+			await RespondAsync($"{user.Mention} uses any pronouns.", allowedMentions: AllowedMentions.None,
+				ephemeral: true);
+			return;
+		}
+		if (dbUser?.NoPronouns ?? false)
+		{
+			await RespondAsync($"{user.Mention} doesn't have any pronouns.", allowedMentions: AllowedMentions.None,
+				ephemeral: true);
 			return;
 		}
 
 		if (pronouns is null || pronouns.Count < 1)
 		{
-			await RespondAsync($"{user.Mention} did not specify their pronouns, have them run **`/pronoun add`** to set them",
+			await RespondAsync($"{user.Mention} did not specify their pronouns, have them run **`/pronoun add`** to set them.",
 				ephemeral: true, allowedMentions: AllowedMentions.None);
 			return;
 		}
@@ -125,6 +128,22 @@ public class PronounCommands : InteractionModuleBase<CatCoreInteractionContext>
 	public async Task AnyPronounsAsync
 	(
 		[Summary("enable", "Should your profile say you use any pronouns?")] bool? enable = null
+	)
+	{
+		if (enable is null)
+		{
+			await RespondAsync(Context.DbUser.AnyPronouns
+				? "You currently have any pronouns set"
+				: "You are using sets of pronouns.", ephemeral: true);
+			return;
+		}
+		else Context.DbUser.AnyPronouns = enable.Value;
+	}
+
+	[SlashCommand("none", "Mark you as not wanting to us pronouns.")]
+	public async Task NoPronounsAsync
+	(
+		[Summary("enable", "Should your profile not have any pronouns?")] bool? enable = null
 	)
 	{
 		if (enable is null)

@@ -222,6 +222,25 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		await RespondWithModalAsync(mb.Build());
 	}
 
+	[SlashCommand("color", "Sets the color of a polls embed")]
+	public async Task UpdateColor
+	(
+		[Autocomplete(typeof(PollAutocompleteProvider))]
+		[Summary("poll", "The poll to update")] Poll poll,
+		[MaxValue(255)]
+		[Summary("red", "The color's red value.")] int r,
+		[MaxValue(255)]
+		[Summary("green", "The color's green value.")] int g,
+		[MaxValue(255)]
+		[Summary("blue", "The color's blue value.")] int b
+	)
+	{
+		poll.Color = new Color(r, g, b).RawValue;
+		Context.Db.Polls.Update(poll);
+		await Context.Db.SaveChangesAsync();
+		await RespondAsync("Updated the polls color", embed: poll.GetEmbed().Build(), ephemeral: true);
+	}
+
 	[ModalInteraction("poll.*.update:*,*;", true)]
 	public async Task UpdatePollModal(string pollIdStr, string minStr, string maxStr, PollModal modal)
 	{
@@ -236,7 +255,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		Context.Db.Guilds.Update(Context.DbGuild);
 		await Context.Db.SaveChangesAsync();
 
-		await RespondAsync("Updated the poll", ephemeral: true);
+		await RespondAsync("Updated the poll", embed: poll.GetEmbed().Build(), ephemeral: true);
 	}
 
 	[ComponentInteraction("poll.*.result", true)]
