@@ -7,7 +7,7 @@
 		<Configurations>Debug;Release;Deploy</Configurations>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Platforms>AnyCPU;ARM32</Platforms>
-		<Version>0.0.2</Version>
+		<Version>0.0.3</Version>
 		<Authors>CottageDwellingCat</Authors>
 		<Company>CottageDwellingCat</Company>
 		<Product>CatCore</Product>
