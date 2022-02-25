@@ -12,8 +12,8 @@ public static partial class DiscordExtensions
 			: throw new ArgumentException($"Command option must not be of type SubCommand or SubCommandGroup.");
 
 	public static string ToFormattedString(this LogMessage message)
-		=> $"[{message.Severity.GetVtsFormat()}{message.Severity.GetShortName()}\x1b[m " +
-		$":\x1b[34m {DateTime.Now.ToString($"{DateTime.Now.DayOfYear,-3}:HH:mm:ss:f")} \x1b[m] " +
+		=> $"[{message.Severity.GetVtsFormat()}{message.Severity.GetShortName()}\x1b[m" +
+		$":\x1b[34m {DateTime.Now.ToString($"{DateTime.Now.DayOfYear,3}:HH:mm:ss:f")} \x1b[m] " +
 		$"{string.Concat(message.Source.Take(14)),-15} {message.Message} {message.Exception?.ToString()}";
 
 

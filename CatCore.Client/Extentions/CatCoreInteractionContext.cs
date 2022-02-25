@@ -6,19 +6,20 @@ public class CatCoreInteractionContext : SocketInteractionContext
 	public User DbUser { get; }
 	public Guild DbGuild { get; set; }
 
-	public CatCoreInteractionContext(DiscordSocketClient client, SocketInteraction interaction, CatCoreContext db) 
+	public CatCoreInteractionContext(DiscordSocketClient client, SocketInteraction interaction, IServiceProvider services)
 		: base(client, interaction)
 	{
-		Db = db;
-		DbUser = db.Users
+		Db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var settings = (ClientSettings)services.GetService(typeof(ClientSettings));
+		DbUser = Db.Users
 			.Include(u => u.Pronouns)
 			.Include(u => u.Messages)
 				.ThenInclude(um => um.Message)
 			.Include(u => u.MessageGroups)
 				.ThenInclude(mg => mg.VisiableTo)
 			.FirstOrDefault(u => u.DiscordID == User.Id);
-			
-		DbGuild = db.Guilds
+
+		DbGuild = Db.Guilds
 			.Include(g => g.Polls)
 				.ThenInclude(p => p.Roles)
 			.Include(g => g.RegexActions)
@@ -26,7 +27,7 @@ public class CatCoreInteractionContext : SocketInteractionContext
 
 		if (DbUser is null)
 		{
-			var group = db.MessageGroups.FirstOrDefault(x => x.Name == "@everyone");
+			var group = Db.MessageGroups.FirstOrDefault(x => x.Name == "@everyone");
 			if (group is null)
 			{
 				group = new()
@@ -34,18 +35,18 @@ public class CatCoreInteractionContext : SocketInteractionContext
 					IsPublic = false,
 					Name = "@everyone"
 				};
-				db.MessageGroups.Add(group);
+				Db.MessageGroups.Add(group);
 			}
-			DbUser = new(true, User.Id);
+			DbUser = new(settings.Devs.Contains(User.Id), User.Id);
 			DbUser.MessageGroups.Add(group);
-			db.Users.Add(DbUser);
-			db.SaveChanges();
+			Db.Users.Add(DbUser);
+			Db.SaveChanges();
 		}
 		if (DbGuild is null)
 		{
 			DbGuild = new(Guild.Id);
-			db.Guilds.Add(DbGuild);
-			db.SaveChanges();
+			Db.Guilds.Add(DbGuild);
+			Db.SaveChanges();
 		}
 	}
 }

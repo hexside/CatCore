@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using CatCore.Client.TypeConverters;
+using Newtonsoft.Json;
+using Discord.WebSocket;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Discord.Rest;
@@ -18,7 +20,7 @@ internal class CommandHandler
 
 	public event Func<LogMessage, Task> Log;
 
-	public CommandHandler(DiscordSocketClient client, InteractionService interaction, IServiceProvider service, 
+	public CommandHandler(DiscordSocketClient client, InteractionService interaction, IServiceProvider service,
 		ClientSettings settings)
 	{
 		_logger = new("Command Handler", LogSeverity.Debug);
@@ -34,7 +36,7 @@ internal class CommandHandler
 	public async Task InitializeAsync()
 	{
 		try
-		{	
+		{
 			_logger.LogVerbose("Adding TypeConverters");
 			_interactionService.AddGenericTypeConverter<Poll>(typeof(PollTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<Pronoun>(typeof(PronounTypeConverter<>));
@@ -95,7 +97,7 @@ internal class CommandHandler
 	private static async Task InteractionFailHandle(string name, IResult result, CatCoreInteractionContext context)
 	{
 		var interaction = context.Interaction;
-		
+
 		string error = $"The command {name} failed because of the {result.Error?.ToString() ?? "unknown"}" +
 			$"\n```diff\n- {result?.ErrorReason.Replace("\n", "\n-")}\n```";
 		// interaction timed out.
@@ -113,14 +115,26 @@ internal class CommandHandler
 		// Send additional information to developers
 		if (context.DbUser.IsDev)
 		{
-			JsonSerializerOptions options = new()
+			JsonSerializerSettings settings = new()
 			{
-				WriteIndented = true,
-				IgnoreReadOnlyFields = false,
-				IgnoreReadOnlyProperties = false,
-				ReferenceHandler = ReferenceHandler.IgnoreCycles,
+				Formatting = Formatting.Indented,
+				ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+				MaxDepth = 15
 			};
-			string message = $"{JsonSerializer.Serialize(context.DbUser, options)}\n{JsonSerializer.Serialize((object)result, options)}";
+			CatCoreErrorData dump = new()
+			{
+				CommandName = name,
+				DiscordGuildId = context.Guild.Id,
+				DiscordUserId = context.User.Id,
+				InternalGuildId = context.DbGuild.GuildId,
+				InternalUserId = context.DbUser.UserID,
+				Error = error,
+				Options = context.Interaction is SocketSlashCommand command
+					? command.Data.Options.ToList()
+					: null,
+				LoadedDbDump = context.Db
+			};
+			string message = $"{JsonConvert.SerializeObject(dump, settings)}";
 
 			using MemoryStream ms = new();
 			using StreamWriter sw = new(ms);
@@ -134,16 +148,16 @@ internal class CommandHandler
 	private async Task HandleInteraction(SocketInteraction interaction)
 	{
 		var db = (CatCoreContext)_services.GetService(typeof(CatCoreContext));
-		var context = new CatCoreInteractionContext(_client, interaction, db);
+		var context = new CatCoreInteractionContext(_client, interaction, _services);
 		await _interactionService.ExecuteCommandAsync(context, _services);
 	}
-	
+
 	private async Task ClientReady()
 	{
 		// make the function only run once
 		if (!_firstClientReady) return;
 		_firstClientReady = false;
-		
+
 		RestGuild guild = await _client.Rest.GetGuildAsync(_debugGuild);
 		if (!_debugMode)
 		{
@@ -165,5 +179,18 @@ internal class CommandHandler
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public class DebugModeCommandAttribute : Attribute
 {
-	
+
+}
+
+public class CatCoreErrorData
+{
+	public ulong DiscordGuildId { get; set; }
+	public int InternalGuildId { get; set; }
+	public ulong DiscordUserId { get; set; }
+	public int InternalUserId { get; set; }
+	public string CommandName { get; set; }
+	public List<SocketSlashCommandDataOption>? Options { get; set; }
+	public string Error { get; set; }
+
+	public CatCoreContext LoadedDbDump { get; set; }
 }

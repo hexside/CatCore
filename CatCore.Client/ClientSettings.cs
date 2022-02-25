@@ -17,7 +17,7 @@ namespace CatCore.Client
 		public string WebhookUrl;
 		public ulong DebugGuildId;
 		public bool DebugMode;
-		public string DBConnectionString;
+		public List<ulong> Devs;
 		public ClientSettings(string fileLocation = "clientSettings.jsonc")
 		{
 			var _this = JsonSerializer.Deserialize<ClientSettings>(File.ReadAllText(fileLocation), _options);
@@ -26,7 +26,7 @@ namespace CatCore.Client
 			WebhookUrl = _this.WebhookUrl.Trim();
 			DebugGuildId = _this.DebugGuildId;
 			DebugMode = _this.DebugMode;
-			DBConnectionString = _this.DBConnectionString;
+			Devs = _this.Devs;
 		}
 		public ClientSettings() { }
 	}
