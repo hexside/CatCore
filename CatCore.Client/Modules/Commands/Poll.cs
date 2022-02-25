@@ -20,7 +20,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			[Autocomplete(typeof(PollAutocompleteProvider))] Poll poll,
 			[Summary("role", "The role to add.")] IRole role,
 			[Summary("description", "The text shown under the role name.")] string description = null,
-			[Summary("emote", "The roles emoji.")] string emote = "<:amity:46264551874257006>"
+			[Summary("emote", "The roles emoji.")] string emote = ""
 		)
 		{
 			var guildUser = (SocketGuildUser)Context.User;
@@ -50,11 +50,12 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 				return;
 			}
 
-			if (!Emote.TryParse(emote, out _))
+			if (!string.IsNullOrWhiteSpace(emote) && !Emote.TryParse(emote, out _))
 			{
 				await RespondAsync($"That emoji is invalid, make sure it is a non-animated emoji, " +
 					"contains no extra text, and matches the formatting data provided by " +
-					"[discord](https://discord.com/developers/docs/reference#message-formatting-formats]", ephemeral: true);
+					"[discord](https://discord.com/developers/docs/reference#message-formatting-formats)", ephemeral: true);
+				return;
 			}
 
 			if (description?.Length >= 100)
@@ -68,6 +69,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 			if (roles.Any(x => x.RoleId == role.Id))
 			{
 				await RespondAsync("That role is already in the poll, run `/poll role update` to change it.", ephemeral: true);
+				return;
 			}
 
 			description ??= role.Name;
@@ -102,7 +104,7 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 				return;
 			}
 			poll.Roles.Remove(role);
-			Context.Db.Guilds.Update(Context.DbGuild);
+			Context.Db.Polls.Update(poll);
 			await Context.Db.SaveChangesAsync();
 
 			await RespondAsync("Removed the role!", ephemeral: true);
@@ -314,8 +316,8 @@ public class PollCommands : InteractionModuleBase<CatCoreInteractionContext>
 		var userRoles = (Context.User as IGuildUser).RoleIds;
 
 		roles.OnEach(x => sb.AddOption(guildRoles
-			.First(y => y.Id == x.RoleId).Name, x.RoleId.ToString(), x.Description, Emote.Parse(x.Emote),
-				isDefault: userRoles.Contains(x.RoleId)));
+			.First(y => y.Id == x.RoleId).Name, x.RoleId.ToString(), x.Description, !string.IsNullOrWhiteSpace(x.Emote)
+				? Emote.Parse(x.Emote) : null, isDefault: userRoles.Contains(x.RoleId)));
 
 
 		roles = roles.Count > 20
