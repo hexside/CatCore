@@ -52,9 +52,9 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 		Defer,
 		DeferEphemerally
 	}
-	
+
 	[Group("message", "message users")]
-	public class Mail : InteractionModuleBase<CatCoreInteractionContext>
+	public class DevMailCommands : InteractionModuleBase<CatCoreInteractionContext>
 	{
 		[SlashCommand("to-user", "Message a User")]
 		public async Task MessageUserAsync
@@ -85,7 +85,7 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 
 			await RespondAsync($"Messaged {discordUser.Mention}.");
 		}
-		
+
 		[SlashCommand("to-group", "Message all users")]
 		public async Task SendPatchnotesAsync
 		(
@@ -110,10 +110,10 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 
 			await group.MessageAllUsersAsync(message, Context.Db);
 			await Context.Db.SaveChangesAsync();
-			
+
 			await RespondAsync("Messaged **all users** (yikes..).");
 		}
-		
+
 		[SlashCommand("create-group", "Creates a new group.")]
 		public async Task CreateGroupAsync
 		(
@@ -132,20 +132,20 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 
 			await RespondAsync("Created the group", ephemeral: true);
 		}
-		
+
 		[SlashCommand("group-member", "Manages Group Membership")]
 		public async Task GroupMember
 		(
-			[Autocomplete(typeof(MessageGroupAutocompleteProvider))]MessageGroup group,
+			[Autocomplete(typeof(MessageGroupAutocompleteProvider))] MessageGroup group,
 			GroupMemberAction action,
-			[Summary("user", null)]SocketUser discordUser
+			[Summary("user", null)] SocketUser discordUser
 		)
 		{
 			var user = await Context.Db.Users
 				.Include(x => x.MessageGroups)
 					.ThenInclude(x => x.VisiableTo)
 				.FirstAsync(x => x.DiscordID == discordUser.Id);
-			switch(action)
+			switch (action)
 			{
 				case GroupMemberAction.Add:
 					{
@@ -156,7 +156,7 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 							await RespondAsync($"Added {discordUser.Mention} to **{group.Name}**.", ephemeral: true);
 						}
 						else
-							await RespondAsync($"{discordUser.Mention} was already in **{group.Name}**.", 
+							await RespondAsync($"{discordUser.Mention} was already in **{group.Name}**.",
 								ephemeral: true);
 					}
 					break;
@@ -166,7 +166,7 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 						{
 							user.MessageGroups.Remove(group);
 							await Context.Db.SaveChangesAsync();
-							await RespondAsync($"Removed {discordUser.Mention} from **{group.Name}**.", 
+							await RespondAsync($"Removed {discordUser.Mention} from **{group.Name}**.",
 								ephemeral: true);
 						}
 						else
@@ -179,11 +179,11 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 						{
 							group.VisiableTo.Add(user);
 							await Context.Db.SaveChangesAsync();
-							await RespondAsync($"{discordUser.Mention} can now see **{group.Name}**.", 
+							await RespondAsync($"{discordUser.Mention} can now see **{group.Name}**.",
 								ephemeral: true);
 						}
 						else
-							await RespondAsync($"{discordUser.Mention} can already see **{group.Name}**.", 
+							await RespondAsync($"{discordUser.Mention} can already see **{group.Name}**.",
 								ephemeral: true);
 					}
 					break;
@@ -193,17 +193,17 @@ public partial class DevCommands : InteractionModuleBase<CatCoreInteractionConte
 						{
 							group.VisiableTo.Remove(user);
 							await Context.Db.SaveChangesAsync();
-							await RespondAsync($"{discordUser.Mention} can no longer see **{group.Name}**.", 
+							await RespondAsync($"{discordUser.Mention} can no longer see **{group.Name}**.",
 								ephemeral: true);
 						}
 						else
-							await RespondAsync($"{discordUser.Mention} could never see **{group.Name}**.", 
+							await RespondAsync($"{discordUser.Mention} could never see **{group.Name}**.",
 								ephemeral: true);
 					}
 					break;
 			}
 		}
-		
+
 		public enum GroupMemberAction
 		{
 			Add,

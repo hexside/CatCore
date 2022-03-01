@@ -2,14 +2,14 @@ namespace CatCore.Client.Commands;
 
 public class CatCoreInteractionContext : SocketInteractionContext
 {
-	public CatCoreContext Db { get; }
+	public CatCoreDbContext Db { get; }
 	public User DbUser { get; }
 	public Guild DbGuild { get; set; }
 
 	public CatCoreInteractionContext(DiscordSocketClient client, SocketInteraction interaction, IServiceProvider services)
 		: base(client, interaction)
 	{
-		Db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		Db = (CatCoreDbContext)services.GetService(typeof(CatCoreDbContext));
 		var settings = (ClientSettings)services.GetService(typeof(ClientSettings));
 		DbUser = Db.Users
 			.Include(u => u.Pronouns)
@@ -23,6 +23,10 @@ public class CatCoreInteractionContext : SocketInteractionContext
 			.Include(g => g.Polls)
 				.ThenInclude(p => p.Roles)
 			.Include(g => g.RegexActions)
+			.Include(g => g.GuildCharacterAttributes)
+			.Include(g => g.Characters)
+				.ThenInclude(c => c.Attributes)
+					.ThenInclude(a => a.Base)
 			.FirstOrDefault(g => g.DiscordId == Guild.Id);
 
 		if (DbUser is null)

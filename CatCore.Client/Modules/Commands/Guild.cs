@@ -4,12 +4,12 @@ using CatCore.Client.Modals;
 
 namespace CatCore.Client.Commands;
 
-[Group("automod", "automod")]
+[Group("admin", "guild")]
 [RequireBotPermission(GuildPermission.ManageMessages | GuildPermission.SendMessages)]
-public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
+public class AdminCommands : InteractionModuleBase<CatCoreInteractionContext>
 {
-	[Group("filter", "filter")]
-	public class AutomodFilterCommands : InteractionModuleBase<CatCoreInteractionContext>
+	[Group("automod", "automod")]
+	public class AdminAutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 	{
 		[SlashCommand("add", "Adds a new filter.")]
 		[RequireUserPermission(GuildPermission.ManageMessages)]
@@ -142,16 +142,108 @@ public class AutomodCommands : InteractionModuleBase<CatCoreInteractionContext>
 
 			await RespondAsync("Deleted the filter.", ephemeral: true);
 		}
+
+		[SlashCommand("notifications", "Change the notification channel.")]
+		public async Task AutomodNotificationChannel
+		(
+			[Summary("channel", "What channel should automod notifications be sent to?")] ITextChannel channel
+		)
+		{
+			Context.DbGuild.MessageFlagChannelId = channel.Id;
+			await Context.Db.SaveChangesAsync();
+			await RespondAsync("Updated the automod channel.", ephemeral: true);
+		}
 	}
 
-	[SlashCommand("notifications", "Change the notification channel.")]
-	public async Task AutomodNotificationChannel
-	(
-		[Summary("channel", "What channel should automod notifications be sent to?")] ITextChannel channel
-	)
+	[Group("attribute", "attribute")]
+	[RequireUserPermission(GuildPermission.ManageGuild)]
+	public class AdminAttributeCommands : InteractionModuleBase<CatCoreInteractionContext>
 	{
-		Context.DbGuild.MessageFlagChannelId = channel.Id;
-		await Context.Db.SaveChangesAsync();
-		await RespondAsync("Updated the automod channel.", ephemeral: true);
+		[SlashCommand("add", "add a new attribute")]
+		public async Task Add
+		(
+			[Summary("required", "Do characters need the attribute to rollplay?")] bool required = false,
+			[Summary("validator", "Enter the regex validator to check attributes against")] string validator = ".*",
+			[Summary("min-length", "Enter the shortest aloud input length")] int? minValue = null,
+			[Summary("max-length", "Enter the largest aloud input length")] int? maxValue = null,
+			[Summary("multiline", "Is the attribute multiline?")] bool multiline = false
+		)
+		{
+			GuildCharacterAttribute attribute = new()
+			{
+				Required = required,
+				RegexValidator = validator,
+				MinValue = minValue,
+				MaxValue = maxValue,
+				Multiline = multiline,
+				Name = "",
+				Description = "",
+				Valid = false,
+			};
+
+			Context.DbGuild.GuildCharacterAttributes.Add(attribute);
+			await Context.Db.SaveChangesAsync();
+
+			await RespondWithModalAsync<GuildCharacterAttributeModal>
+				($"attribute.{attribute.GuildCharacterAttributeId}.update");
+		}
+
+		[ModalInteraction("attribute.*.update", true)]
+		public async Task EditModal(string idStr, GuildCharacterAttributeModal modal)
+		{
+			int id = int.Parse(idStr);
+			GuildCharacterAttribute attribute = Context.DbGuild.GuildCharacterAttributes
+				.First(x => x.GuildCharacterAttributeId == id);
+
+			attribute.Valid = true;
+			attribute.Description = modal.Description;
+			attribute.Name = modal.Name;
+			Context.Db.GuildCharacterAttributes.Update(attribute);
+			await Context.Db.SaveChangesAsync();
+
+			await RespondAsync("update the attribute", ephemeral: true);
+		}
+
+		[SlashCommand("edit", "modify a guild attribute")]
+		public async Task Edit
+		(
+			[Autocomplete(typeof(GuildCharacterAttributeAutocompleteProvider))]
+			[Summary("attribute", "the attribute to edit.")] GuildCharacterAttribute attribute,
+			[Summary("required", "Do characters need the attribute to rollplay?")] bool? required = null,
+			[Summary("validator", "Enter the regex validator to check attributes against")] string? validator = null,
+			[Summary("min-length", "Enter the shortest aloud input length")] int? minValue = null,
+			[Summary("max-length", "Enter the largest aloud input length")] int? maxValue = null,
+			[Summary("multiline", "Is the attribute multiline?")] bool? multiline = null
+		)
+		{
+			attribute.Required = required ?? attribute.Required;
+			attribute.RegexValidator = validator ?? attribute.RegexValidator;
+			attribute.MinValue = minValue ?? attribute.MinValue;
+			attribute.MaxValue = maxValue ?? attribute.MaxValue;
+			attribute.Multiline = multiline ?? attribute.Multiline;
+
+			Context.Db.GuildCharacterAttributes.Update(attribute);
+			await Context.Db.SaveChangesAsync();
+
+			var mb = new ModalBuilder()
+				.WithCustomId($"attribute.{attribute.GuildCharacterAttributeId}.update")
+				.WithTitle("Update attribute.")
+				.AddTextInput("name", "name", TextInputStyle.Short, attribute.Name, 1, 30)
+				.AddTextInput("description", "description", TextInputStyle.Short, attribute.Description, 1, 80);
+
+			await RespondWithModalAsync(mb.Build());
+		}
+
+		[SlashCommand("delete", "delete a character attribute")]
+		public async Task Delete
+		(
+			[Autocomplete(typeof(GuildCharacterAttributeAutocompleteProvider))]
+			[Summary("attribute", "the attribute to delete.")] GuildCharacterAttribute attribute
+		)
+		{
+			Context.DbGuild.GuildCharacterAttributes.Remove(attribute);
+			await Context.Db.SaveChangesAsync();
+			await RespondAsync("deleted the attribute", ephemeral: true);
+		}
 	}
 }

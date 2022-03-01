@@ -5,6 +5,7 @@ global using CatCore.Utils;
 global using CatCore.Data;
 global using Discord.Rest;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Design;
 global using CatCore.Client.Commands;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ internal class Program
 
 	private static ServiceProvider _configureServices() => new ServiceCollection()
 		.AddSingleton(new ClientSettings("clientSettings.json"))
-		.AddDbContext<CatCoreContext>()
+		.AddDbContext<CatCoreDbContext>()
 		.AddSingleton(new DiscordSocketClient(new()
 		{
 			LogLevel = LogSeverity.Debug,
@@ -45,7 +46,7 @@ internal class Program
 		var commands = services.GetRequiredService<InteractionService>();
 		var handler = services.GetRequiredService<CommandHandler>();
 		var settings = services.GetRequiredService<ClientSettings>();
-		var context = services.GetRequiredService<CatCoreContext>();
+		var context = services.GetRequiredService<CatCoreDbContext>();
 		client.Log += x =>
 		{
 			_logger.Log(x);
@@ -86,7 +87,7 @@ internal class Program
 		if (message.Author is not IGuildUser user) return;
 		if (message.Author.Id == client.CurrentUser.Id) return;
 
-		var guild = await new CatCoreContext()
+		var guild = await new CatCoreDbContext()
 			.Guilds
 			.Include(x => x.RegexActions)
 			.FirstAsync(x => x.DiscordId == user.GuildId);
