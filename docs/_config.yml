@@ -4,3 +4,5 @@ title: CatCore Documentation
 aux_links:
   "Support Server":
     - "//discord.gg/563mXJBvtP"
+  "Invite Bot":
+    - "//discord.com/oauth2/authorize?client_id=940417404977172500&scope=bot%20applications.commands&permissions=335595520"
