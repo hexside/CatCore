@@ -9,7 +9,7 @@ internal class PronounAutocompleteProvider : AutocompleteHandler
 	{
 		bool fromUser = parameter.Attributes.Any(x => x is AutocompleteFromUserAtribute);
 		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
-		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var db = (CatCoreDbContext)services.GetService(typeof(CatCoreDbContext));
 
 		User user = await db.Users.Include(x => x.Pronouns).FirstAsync(x => x.DiscordID == context.User.Id);
 
@@ -70,7 +70,7 @@ internal class UserMessageAutocompleteProvider : AutocompleteHandler
 	public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
 		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
 	{
-		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var db = (CatCoreDbContext)services.GetService(typeof(CatCoreDbContext));
 		var searchType = (MailSearchType)Enum.Parse(typeof(MailSearchType), (string)autocompleteInteraction.Data.Options
 			.First(x => x.Name == "filter")
 			.Value);
@@ -99,10 +99,10 @@ internal class MessageGroupAutocompleteProvider : AutocompleteHandler
 		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
 	{
 		bool fromUser = parameter.Attributes.Any(x => x is AutocompleteFromUserAtribute);
-		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var db = (CatCoreDbContext)services.GetService(typeof(CatCoreDbContext));
 		var user = ((CatCoreInteractionContext)context).DbUser;
 		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
-		
+
 		var groups = (await db.MessageGroups
 			.Include(x => x.VisiableTo)
 			.Where(x => x.IsPublic || x.VisiableTo.Contains(user) || user.IsDev)
@@ -130,6 +130,42 @@ internal class RegexActionAutocompleteProvider : AutocompleteHandler
 			.Select(x => new AutocompleteResult(x.ActionName, x.RegexActionId.ToString()));
 
 		return Task.FromResult(AutocompletionResult.FromSuccess(regexActions));
+	}
+}
+
+internal class CharacterAutocompleteProvider : AutocompleteHandler
+{
+	public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
+		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+	{
+		bool fromUser = parameter.Attributes.Any(x => x is AutocompleteFromUserAtribute);
+		var dbGuild = (context as CatCoreInteractionContext).DbGuild;
+		var dbUser = (context as CatCoreInteractionContext).DbUser;
+		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
+
+		var characters = dbGuild.Characters
+			.Where(x => x.Name.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
+			.Where(x => !fromUser || x.CreatorId == dbUser.UserID)
+			.Select(x => new AutocompleteResult(x.Name, x.CharacterId.ToString()));
+
+		return Task.FromResult(AutocompletionResult.FromSuccess(characters));
+	}
+}
+
+internal class GuildCharacterAttributeAutocompleteProvider : AutocompleteHandler
+{
+	public override Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context,
+		IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+	{
+		var dbGuild = (context as CatCoreInteractionContext).DbGuild;
+		string currentValue = autocompleteInteraction.Data.Current.Value.ToString();
+
+		var attributes = dbGuild.GuildCharacterAttributes
+			.Where(x => x.Name.Contains(currentValue, StringComparison.OrdinalIgnoreCase))
+			.Where(x => x.Valid)
+			.Select(x => new AutocompleteResult(x.Name, x.GuildCharacterAttributeId.ToString()));
+
+		return Task.FromResult(AutocompletionResult.FromSuccess(attributes));
 	}
 }
 

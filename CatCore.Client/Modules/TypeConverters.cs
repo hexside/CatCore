@@ -39,7 +39,7 @@ public class PronounTypeConverter<T> : TypeConverter<T> where T : Pronoun
 	public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context,
 		IApplicationCommandInteractionDataOption option, IServiceProvider services)
 	{
-		var db = (CatCoreContext)services.GetService(typeof(CatCoreContext));
+		var db = (CatCoreDbContext)services.GetService(typeof(CatCoreDbContext));
 		string value;
 
 		if (option.Value is Optional<object> optional)
@@ -54,7 +54,7 @@ public class PronounTypeConverter<T> : TypeConverter<T> where T : Pronoun
 		}
 		catch (Exception ex)
 		{
-			await context.Interaction.RespondAsync("Oops, that pronoun isn't in the database, run `/pronoun new` to add it.", ephemeral:true);
+			await context.Interaction.RespondAsync("Oops, that pronoun isn't in the database, run `/pronoun new` to add it.", ephemeral: true);
 			return TypeConverterResult.FromError(ex);
 		}
 	}
@@ -128,7 +128,7 @@ public class RegexActionTypeConverter<T> : TypeConverter<T> where T : RegexActio
 			value = optional.IsSpecified ? (string)optional.Value : "";
 		else
 			value = (string)option.Value;
-		
+
 		try
 		{
 			var intValue = int.Parse(value);
@@ -139,6 +139,62 @@ public class RegexActionTypeConverter<T> : TypeConverter<T> where T : RegexActio
 		catch (Exception ex)
 		{
 			await context.Interaction.RespondAsync("We couldn't load that automod action, make sure you picked something from the autocomplete menu.", ephemeral: true);
+			return TypeConverterResult.FromError(ex);
+		}
+	}
+}
+
+public class CharacterTypeConverter<T> : TypeConverter<T> where T : Character
+{
+	public override ApplicationCommandOptionType GetDiscordType()
+		=> ApplicationCommandOptionType.String;
+
+	public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+	{
+		string value;
+		if (option.Value is Optional<object> optional)
+			value = optional.IsSpecified ? (string)optional.Value : "";
+		else
+			value = (string)option.Value;
+
+		try
+		{
+			var intValue = int.Parse(value);
+			var converted = ((CatCoreInteractionContext)context).DbGuild.Characters
+				.First(x => x.CharacterId == intValue);
+			return TypeConverterResult.FromSuccess(converted);
+		}
+		catch (Exception ex)
+		{
+			await context.Interaction.RespondAsync("We couldn't load that character, make sure you picked something from the autocomplete menu.", ephemeral: true);
+			return TypeConverterResult.FromError(ex);
+		}
+	}
+}
+
+public class GuildCharacterAttributeTypeConverter<T> : TypeConverter<T> where T : GuildCharacterAttribute
+{
+	public override ApplicationCommandOptionType GetDiscordType()
+		=> ApplicationCommandOptionType.String;
+
+	public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, IApplicationCommandInteractionDataOption option, IServiceProvider services)
+	{
+		string value;
+		if (option.Value is Optional<object> optional)
+			value = optional.IsSpecified ? (string)optional.Value : "";
+		else
+			value = (string)option.Value;
+
+		try
+		{
+			var intValue = int.Parse(value);
+			var converted = ((CatCoreInteractionContext)context).DbGuild.GuildCharacterAttributes
+				.First(x => x.GuildCharacterAttributeId == intValue);
+			return TypeConverterResult.FromSuccess(converted);
+		}
+		catch (Exception ex)
+		{
+			await context.Interaction.RespondAsync("We couldn't load that guild character attribute, make sure you picked something from the autocomplete menu.", ephemeral: true);
 			return TypeConverterResult.FromError(ex);
 		}
 	}

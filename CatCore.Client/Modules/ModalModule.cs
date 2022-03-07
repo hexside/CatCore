@@ -8,13 +8,15 @@ public class PollModal : IModal
 	[InputLabel("Name")]
 	public string Name { get; set; }
 
-	[ModalTextInput("description", TextInputStyle.Paragraph, "Enter your poll's description", 1, 2048)]
+	[ModalTextInput("description", TextInputStyle.Paragraph, "Enter your poll's description, markdown, links, and " +
+		"newlines are supported.", 1, 2048)]
 	[InputLabel("Description")]
 	public string Description { get; set; }
 
 	[ModalTextInput("footer", TextInputStyle.Paragraph, "Enter your poll's footer", 1, 2048)]
 	[InputLabel("Footer")]
-	public string Footer { get; set; }
+	[RequiredInput(false)]
+	public string Footer { get; set; } = "";
 
 	[ModalTextInput("image_url", TextInputStyle.Short, "Enter your poll's image url", 1, 1024)]
 	[InputLabel("image url")]
@@ -82,4 +84,48 @@ public class PronounModal : IModal
 	[ModalTextInput("reflexive", TextInputStyle.Short, "themself in: sometimes they go to the park by themself.", 1, 50)]
 	[InputLabel("Reflexive")]
 	public string Reflexive { get; set; }
+}
+
+public class CharacterModal : IModal
+{
+	public string Title => "Create a character";
+
+	[ModalTextInput("name", TextInputStyle.Short, "enter your character's name.", 1, 30)]
+	[InputLabel("Name")]
+	public string Name { get; set; }
+
+	[ModalTextInput("description", TextInputStyle.Paragraph, "Describe your character, markdown, links, and newlines " +
+		"are supported.", 1, 500)]
+	[InputLabel("Description")]
+	public string Description { get; set; }
+}
+
+public class AttributeValueModal : IModal
+{
+	public string Title => "FOR DEBUGGING USE ONLY";
+
+	[ModalTextInput("value")]
+	public string Value { get; set; }
+}
+
+public class CharacterDeleteConfirmationModal : IModal
+{
+	public string Title => "FOR DEBUGGING USE ONLY";
+
+	[ModalTextInput("value")]
+	public string Value { get; set; }
+}
+
+public class GuildCharacterAttributeModal : IModal
+{
+	public string Title => "Create a new character attribute.";
+
+
+	[ModalTextInput("name", TextInputStyle.Short, "enter the attributes's name.", 1, 30)]
+	[InputLabel("Name")]
+	public string Name { get; set; }
+
+	[ModalTextInput("description", TextInputStyle.Short, "describe the attribute", 1, 80)]
+	[InputLabel("Description")]
+	public string Description { get; set; }
 }

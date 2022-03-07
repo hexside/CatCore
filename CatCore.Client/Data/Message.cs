@@ -16,13 +16,13 @@ public class Message
 	/// 	Internal not set by admins sending the message, not visible to users.
 	/// </summary>
 	public string AdminMessage { get; set; }
-	
+
 	/// <summary>
 	/// 	Adds the message to a collection of users.
 	/// </summary>
 	/// <param name="users">The users to add the message to.</param>
 	/// <param name="db">The db context to work in.</param>
-	public async Task AddToAsync(IEnumerable<User> users, CatCoreContext db)
+	public async Task AddToAsync(IEnumerable<User> users, CatCoreDbContext db)
 	{
 		if (MessageId == default) await db.Messages.AddAsync(this);
 		foreach (User user in users)

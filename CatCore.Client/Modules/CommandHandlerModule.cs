@@ -43,6 +43,8 @@ internal class CommandHandler
 			_interactionService.AddGenericTypeConverter<UserMessage>(typeof(UserMessageTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<MessageGroup>(typeof(MessageGroupTypeConverter<>));
 			_interactionService.AddGenericTypeConverter<RegexAction>(typeof(RegexActionTypeConverter<>));
+			_interactionService.AddGenericTypeConverter<Character>(typeof(CharacterTypeConverter<>));
+			_interactionService.AddGenericTypeConverter<GuildCharacterAttribute>(typeof(GuildCharacterAttributeTypeConverter<>));
 
 			await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
 
@@ -147,7 +149,7 @@ internal class CommandHandler
 
 	private async Task HandleInteraction(SocketInteraction interaction)
 	{
-		var db = (CatCoreContext)_services.GetService(typeof(CatCoreContext));
+		var db = (CatCoreDbContext)_services.GetService(typeof(CatCoreDbContext));
 		var context = new CatCoreInteractionContext(_client, interaction, _services);
 		await _interactionService.ExecuteCommandAsync(context, _services);
 	}
@@ -192,5 +194,5 @@ public class CatCoreErrorData
 	public List<SocketSlashCommandDataOption>? Options { get; set; }
 	public string Error { get; set; }
 
-	public CatCoreContext LoadedDbDump { get; set; }
+	public CatCoreDbContext LoadedDbDump { get; set; }
 }

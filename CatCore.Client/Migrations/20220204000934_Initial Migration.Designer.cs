@@ -10,148 +10,148 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CatCore.Client.Migrations
 {
-    [DbContext(typeof(CatCoreContext))]
-    [Migration("20220204000934_Initial Migration")]
-    partial class InitialMigration
-    {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
+	[DbContext(typeof(CatCoreDbContext))]
+	[Migration("20220204000934_Initial Migration")]
+	partial class InitialMigration
+	{
+		protected override void BuildTargetModel(ModelBuilder modelBuilder)
+		{
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
+			modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
 
-            modelBuilder.Entity("CatCore.Data.Poll", b =>
-                {
-                    b.Property<int>("PollId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+			modelBuilder.Entity("CatCore.Data.Poll", b =>
+				{
+					b.Property<int>("PollId")
+						.ValueGeneratedOnAdd()
+						.HasColumnType("INTEGER");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
+					b.Property<string>("Description")
+						.HasColumnType("TEXT");
 
-                    b.Property<string>("Footer")
-                        .HasColumnType("TEXT");
+					b.Property<string>("Footer")
+						.HasColumnType("TEXT");
 
-                    b.Property<ulong>("GuildId")
-                        .HasColumnType("INTEGER");
+					b.Property<ulong>("GuildId")
+						.HasColumnType("INTEGER");
 
-                    b.Property<int>("Max")
-                        .HasColumnType("INTEGER");
+					b.Property<int>("Max")
+						.HasColumnType("INTEGER");
 
-                    b.Property<int>("Min")
-                        .HasColumnType("INTEGER");
+					b.Property<int>("Min")
+						.HasColumnType("INTEGER");
 
-                    b.Property<string>("Title")
-                        .HasColumnType("TEXT");
+					b.Property<string>("Title")
+						.HasColumnType("TEXT");
 
-                    b.HasKey("PollId");
+					b.HasKey("PollId");
 
-                    b.ToTable("Polls");
-                });
+					b.ToTable("Polls");
+				});
 
-            modelBuilder.Entity("CatCore.Data.PollRole", b =>
-                {
-                    b.Property<int>("PollRoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+			modelBuilder.Entity("CatCore.Data.PollRole", b =>
+				{
+					b.Property<int>("PollRoleId")
+						.ValueGeneratedOnAdd()
+						.HasColumnType("INTEGER");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+					b.Property<string>("Description")
+						.IsRequired()
+						.HasColumnType("TEXT");
 
-                    b.Property<int>("PollId")
-                        .HasColumnType("INTEGER");
+					b.Property<int>("PollId")
+						.HasColumnType("INTEGER");
 
-                    b.Property<ulong>("RoleId")
-                        .HasColumnType("INTEGER");
+					b.Property<ulong>("RoleId")
+						.HasColumnType("INTEGER");
 
-                    b.HasKey("PollRoleId");
+					b.HasKey("PollRoleId");
 
-                    b.HasIndex("PollId");
+					b.HasIndex("PollId");
 
-                    b.ToTable("PollRoles");
-                });
+					b.ToTable("PollRoles");
+				});
 
-            modelBuilder.Entity("CatCore.Data.User", b =>
-                {
-                    b.Property<int>("UserID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+			modelBuilder.Entity("CatCore.Data.User", b =>
+				{
+					b.Property<int>("UserID")
+						.ValueGeneratedOnAdd()
+						.HasColumnType("INTEGER");
 
-                    b.Property<ulong>("DiscordID")
-                        .HasColumnType("INTEGER");
+					b.Property<ulong>("DiscordID")
+						.HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsDev")
-                        .HasColumnType("INTEGER");
+					b.Property<bool>("IsDev")
+						.HasColumnType("INTEGER");
 
-                    b.HasKey("UserID");
+					b.HasKey("UserID");
 
-                    b.ToTable("Users");
-                });
+					b.ToTable("Users");
+				});
 
-            modelBuilder.Entity("CatCore.Pronoun", b =>
-                {
-                    b.Property<int>("PronounId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+			modelBuilder.Entity("CatCore.Pronoun", b =>
+				{
+					b.Property<int>("PronounId")
+						.ValueGeneratedOnAdd()
+						.HasColumnType("INTEGER");
 
-                    b.Property<string>("Object")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+					b.Property<string>("Object")
+						.IsRequired()
+						.HasColumnType("TEXT");
 
-                    b.Property<string>("PossessiveAdjective")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+					b.Property<string>("PossessiveAdjective")
+						.IsRequired()
+						.HasColumnType("TEXT");
 
-                    b.Property<string>("PossessivePronoun")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+					b.Property<string>("PossessivePronoun")
+						.IsRequired()
+						.HasColumnType("TEXT");
 
-                    b.Property<string>("Reflexive")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+					b.Property<string>("Reflexive")
+						.IsRequired()
+						.HasColumnType("TEXT");
 
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+					b.Property<string>("Subject")
+						.IsRequired()
+						.HasColumnType("TEXT");
 
-                    b.Property<int?>("UserID")
-                        .HasColumnType("INTEGER");
+					b.Property<int?>("UserID")
+						.HasColumnType("INTEGER");
 
-                    b.HasKey("PronounId");
+					b.HasKey("PronounId");
 
-                    b.HasIndex("UserID");
+					b.HasIndex("UserID");
 
-                    b.ToTable("Pronouns");
-                });
+					b.ToTable("Pronouns");
+				});
 
-            modelBuilder.Entity("CatCore.Data.PollRole", b =>
-                {
-                    b.HasOne("CatCore.Data.Poll", "Poll")
-                        .WithMany("Roles")
-                        .HasForeignKey("PollId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+			modelBuilder.Entity("CatCore.Data.PollRole", b =>
+				{
+					b.HasOne("CatCore.Data.Poll", "Poll")
+						.WithMany("Roles")
+						.HasForeignKey("PollId")
+						.OnDelete(DeleteBehavior.Cascade)
+						.IsRequired();
 
-                    b.Navigation("Poll");
-                });
+					b.Navigation("Poll");
+				});
 
-            modelBuilder.Entity("CatCore.Pronoun", b =>
-                {
-                    b.HasOne("CatCore.Data.User", null)
-                        .WithMany("Pronouns")
-                        .HasForeignKey("UserID");
-                });
+			modelBuilder.Entity("CatCore.Pronoun", b =>
+				{
+					b.HasOne("CatCore.Data.User", null)
+						.WithMany("Pronouns")
+						.HasForeignKey("UserID");
+				});
 
-            modelBuilder.Entity("CatCore.Data.Poll", b =>
-                {
-                    b.Navigation("Roles");
-                });
+			modelBuilder.Entity("CatCore.Data.Poll", b =>
+				{
+					b.Navigation("Roles");
+				});
 
-            modelBuilder.Entity("CatCore.Data.User", b =>
-                {
-                    b.Navigation("Pronouns");
-                });
+			modelBuilder.Entity("CatCore.Data.User", b =>
+				{
+					b.Navigation("Pronouns");
+				});
 #pragma warning restore 612, 618
-        }
-    }
+		}
+	}
 }
